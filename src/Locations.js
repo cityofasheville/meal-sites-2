@@ -2,27 +2,60 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import moment from 'moment';
 import config from './config';
+import FilterOptions from './FilterOptions';
 import LocationCard from './LocationCard';
-// import { Link } from 'react-router-dom';
 
 class Locations extends Component {
   constructor(props) {
     super(props);
-    console.log('[CONSTRUCTOR]');
-    console.log(props);
-    let query = new URLSearchParams(props.location.search);
-    let searchTerm = query.toString();
-    let haveQueryToStart = false;
-    if (searchTerm.length) {
-      haveQueryToStart = true;
-    }
     this.state = {
-      locationList: [],
+      locationListFull: [],
+      locationListFiltered: [],
+      activeFilters: {},
       filterOptions: {},
       filterSelectors: [],
-      haveLocationData: false,
-      newQuery: haveQueryToStart
+      haveLocationData: false
     };
+  }
+
+  handleLookup = () => {
+    axios.get(`${config.api_url}`)
+    .then(res => {
+      let newActiveFilters = {};
+      let locationsInitialized = this.processRawLocations(res.data.features);
+
+      console.log(locationsInitialized);
+
+      let currentUrlParams = new URLSearchParams(this.props.location.search);
+      let paramString = currentUrlParams.toString();
+      if (paramString.length) {
+        console.log('INITIAL PARAM CHECK');
+        console.log(Object.keys(locationsInitialized.filterOptions));
+        Object.keys(locationsInitialized.filterOptions).forEach( (filter) => {
+          console.log(`Key: ${filter}`);
+          console.log(currentUrlParams.getAll(filter));
+          newActiveFilters[filter] = currentUrlParams.getAll(filter);
+        });
+      }
+      this.setState({
+        filterOptions: locationsInitialized.filterOptions,
+        filterSelectors: locationsInitialized.filterSelectors,
+        locationListFull: locationsInitialized.objectsProcessed,
+        activeFilters: newActiveFilters,
+        haveLocationData: true
+      });
+    })
+    .catch(err => {
+      if (err.response) {
+        console.log('Unexpected response: ' + err.message);
+        // client received an error response (5xx, 4xx)
+      } else if (err.request) {
+        console.log('Request failed: ' + err.message);
+        // client never received a response, or request never left
+      } else {
+        console.log(err.message);
+      }
+    });
   }
 
   processRawLocations = (data) => {
@@ -46,9 +79,24 @@ class Locations extends Component {
 
     // Object will contain arrays of objects representing filter options
     let filterOptions = {
-      areas: [],
-      days: [],
-      types: [],
+      areas: {
+        filterHeader: 'Located in...',
+        defaultDescription: 'Any Area',
+        selectLabel: 'Choose Specific Location(s):',
+        data: []
+      },
+      days: {
+        filterHeader: 'Open on...',
+        defaultDescription: 'Any Day of the Week',
+        selectLabel: 'Choose Specific Day(s) Open:',
+        data: []
+      },
+      types: {
+        filterHeader: 'Providing...',
+        defaultDescription: 'Any Service Type',
+        selectLabel: 'Choose Specific Service(s) Offered:',
+        data: []
+      },
     };
 
     let filterSelectors = [];
@@ -91,8 +139,8 @@ class Locations extends Component {
           sanitizedValue = 'area-' + obj.attributes.generalArea.toLowerCase().replace(/[^0-9a-z]/gi, '');
           cardSelectors += sanitizedValue + ' ';
   
-          if (filterOptions.areas.map(function(e) { return e.value; }).indexOf(sanitizedValue) < 0) {
-              filterOptions.areas.push(
+          if (filterOptions.areas.data.map(function(e) { return e.value; }).indexOf(sanitizedValue) < 0) {
+              filterOptions.areas.data.push(
               {
                 label: obj.attributes.generalArea,
                 value: sanitizedValue
@@ -106,13 +154,13 @@ class Locations extends Component {
           sanitizedValue = 'type-' + obj.attributes.type.toLowerCase().replace(/[^0-9a-z]/gi, '');
           cardSelectors += sanitizedValue + ' ';
   
-          if (filterOptions.types.map(function(e) { return e.value; }).indexOf(sanitizedValue) < 0) {
+          if (filterOptions.types.data.map(function(e) { return e.value; }).indexOf(sanitizedValue) < 0) {
             if (obj.attributes.type === 'Students') { 
               typeLabel = 'Student Meals' 
             } else {
               typeLabel = obj.attributes.type 
             }
-            filterOptions.types.push(
+            filterOptions.types.data.push(
               {
                 label: typeLabel,
                 value: sanitizedValue
@@ -124,8 +172,8 @@ class Locations extends Component {
         if (obj.attributes.mo) {
           cardSelectors += 'day-mo ';
           dayClassM = 'day-of-week--on';
-          if (filterOptions.days.map(function(e) { return e.value; }).indexOf('day-mo') < 0) {
-            filterOptions.days.push(
+          if (filterOptions.days.data.map(function(e) { return e.value; }).indexOf('day-mo') < 0) {
+            filterOptions.days.data.push(
               {
                 index: 0,
                 label: 'Monday',
@@ -141,8 +189,8 @@ class Locations extends Component {
         if (obj.attributes.tu) {
           cardSelectors += 'day-tu ';
           dayClassT = 'day-of-week--on';
-          if (filterOptions.days.map(function(e) { return e.value; }).indexOf('day-tu') < 0) {
-            filterOptions.days.push(
+          if (filterOptions.days.data.map(function(e) { return e.value; }).indexOf('day-tu') < 0) {
+            filterOptions.days.data.push(
               {
                 index: 1,
                 label: 'Tuesday',
@@ -158,8 +206,8 @@ class Locations extends Component {
         if (obj.attributes.we) {
           cardSelectors += 'day-we ';
           dayClassW = 'day-of-week--on';
-          if (filterOptions.days.map(function(e) { return e.value; }).indexOf('day-we') < 0) {
-            filterOptions.days.push(
+          if (filterOptions.days.data.map(function(e) { return e.value; }).indexOf('day-we') < 0) {
+            filterOptions.days.data.push(
               {
                 index: 2,
                 label: 'Wednesday',
@@ -175,8 +223,8 @@ class Locations extends Component {
         if (obj.attributes.th) {
           cardSelectors += 'day-th ';
           dayClassTh = 'day-of-week--on';
-          if (filterOptions.days.map(function(e) { return e.value; }).indexOf('day-th') < 0) {
-            filterOptions.days.push(
+          if (filterOptions.days.data.map(function(e) { return e.value; }).indexOf('day-th') < 0) {
+            filterOptions.days.data.push(
               {
                 index: 3,
                 label: 'Thursday',
@@ -192,8 +240,8 @@ class Locations extends Component {
         if (obj.attributes.fr) {
           cardSelectors += 'day-fr ';
           dayClassF = 'day-of-week--on';
-          if (filterOptions.days.map(function(e) { return e.value; }).indexOf('day-fr') < 0) {
-            filterOptions.days.push(
+          if (filterOptions.days.data.map(function(e) { return e.value; }).indexOf('day-fr') < 0) {
+            filterOptions.days.data.push(
               {
                 index: 4,
                 label: 'Friday',
@@ -209,8 +257,8 @@ class Locations extends Component {
         if (obj.attributes.sa) {
           cardSelectors += 'day-sa ';
           dayClassSa = 'day-of-week--on';
-          if (filterOptions.days.map(function(e) { return e.value; }).indexOf('day-sa') < 0) {
-            filterOptions.days.push(
+          if (filterOptions.days.data.map(function(e) { return e.value; }).indexOf('day-sa') < 0) {
+            filterOptions.days.data.push(
               {
                 index: 5,
                 label: 'Saturday',
@@ -226,8 +274,8 @@ class Locations extends Component {
         if (obj.attributes.su) {
           cardSelectors += 'day-su ';
           dayClassSu = 'day-of-week--on';
-          if (filterOptions.days.map(function(e) { return e.value; }).indexOf('day-su') < 0) {
-            filterOptions.days.push(
+          if (filterOptions.days.data.map(function(e) { return e.value; }).indexOf('day-su') < 0) {
+            filterOptions.days.data.push(
               {
                 index: 6,
                 label: 'Sunday',
@@ -326,6 +374,9 @@ class Locations extends Component {
         // addCard(obj.attributes);
 
         objCount++;
+      } else {
+        // Objects will be skipped if outside date range, or if name is NULL
+        // console.log(`Skipping Record - ${obj.attributes.name} - ${obj.attributes.OBJECTID}`);
       }
     }
 
@@ -333,9 +384,9 @@ class Locations extends Component {
     // console.log(filterSelectors);
 
     // Sort the options sensibly for display
-    filterOptions.areas.sort( (a,b) => a.label > b.label ? 1 : -1 );
-    filterOptions.types.sort( (a,b) => a.label > b.label ? 1 : -1 );
-    filterOptions.days.sort( (a,b) => a.index > b.index ? 1 : -1 )
+    filterOptions.areas.data.sort( (a,b) => a.label > b.label ? 1 : -1 );
+    filterOptions.types.data.sort( (a,b) => a.label > b.label ? 1 : -1 );
+    filterOptions.days.data.sort( (a,b) => a.index > b.index ? 1 : -1 )
 
     console.log('-- Initialization Complete --');
 
@@ -346,37 +397,87 @@ class Locations extends Component {
     return dataToReturn;
   }
 
-  handleLookup = () => {
-    axios.get(`${config.api_url}`)
-    .then(res => {
-      let locationsInitialized = this.processRawLocations(res.data.features);
-      console.log(locationsInitialized);
-      this.setState({
-        filterOptions: locationsInitialized.filterOptions,
-        filterSelectors: locationsInitialized.filterSelectors,
-        locationList: locationsInitialized.objectsProcessed,
-        haveLocationData: true
-      });
-    })
-    .catch(err => {
-      if (err.response) {
-        console.log('Unexpected response: ' + err.message);
-        // client received an error response (5xx, 4xx)
-      } else if (err.request) {
-        console.log('Request failed: ' + err.message);
-        // client never received a response, or request never left
-      } else {
-        console.log(err.message);
+  submitQueryString = (e) => {
+    e.preventDefault();
+    let currentUrlParams = new URLSearchParams(window.location.search);
+    if (!currentUrlParams.has(e.target.dataset.filterType)) {
+      currentUrlParams.set(e.target.dataset.filterType, e.target[e.target.options.selectedIndex].value);
+      this.props.history.push(`?${currentUrlParams}`);
+      console.log('Pushing history, component should update');
+    } else {
+      if (currentUrlParams.getAll(e.target.dataset.filterType).indexOf(e.target[e.target.options.selectedIndex].value) < 0) {
+        currentUrlParams.append(e.target.dataset.filterType, e.target[e.target.options.selectedIndex].value);
+        this.props.history.push(`?${currentUrlParams}`);
+        console.log('Pushing history, component should update');
       }
+    }
+    let newActiveFilters = {};
+    Object.keys(this.state.filterOptions).forEach( (filter) => {
+      newActiveFilters[filter] = currentUrlParams.getAll(filter);
+    });
+    this.setState({
+      activeFilters: newActiveFilters
     });
   }
 
+  removeQueryParam = (e) => {
 
-  submitQueryString = (e) => {
-    e.preventDefault();
-    const searchTerm = encodeURIComponent(e.target.q.value);
-    this.props.history.push(`?q=${searchTerm}`);
+    let currentUrlParams = new URLSearchParams(window.location.search);
+
+    let currentTypeParams = currentUrlParams.getAll(e.target.dataset.filterType);
+    console.log(currentTypeParams);
+
+    let remainingTypeParams = currentTypeParams.filter( (item) => {
+      return (item !== e.target.dataset.filterValue);
+    });
+
+    // Deletes ALL params of a type (maybe not what we want)
+    currentUrlParams.delete(e.target.dataset.filterType);
+
+    // If there was initially more than one param of the deleted type, add them back now
+    if(remainingTypeParams.length) {
+      remainingTypeParams.forEach( (param) => {
+        currentUrlParams.append(e.target.dataset.filterType, param);
+      })
+    }
+
+    this.props.history.push(`?${currentUrlParams}`);
     console.log('Pushing history, component should update');
+
+    let newActiveFilters = {};
+    Object.keys(this.state.filterOptions).forEach( (filter) => {
+      newActiveFilters[filter] = currentUrlParams.getAll(filter);
+    });
+    this.setState({
+      activeFilters: newActiveFilters
+    });
+  }
+
+  filterLocations = (location) => {
+
+    let thisLocationPasses = true;
+    let termMatches = 0;
+
+    Object.keys(this.state.activeFilters).forEach( (key, i) => {
+
+      if (this.state.activeFilters[key].length) {
+
+        this.state.activeFilters[key].forEach( (term) => {
+          if (location.selectors.includes(term)) {
+            termMatches++;
+          }
+        });
+
+        if (!termMatches) {
+          thisLocationPasses = false;
+        }
+
+        termMatches = 0;
+      }
+
+    });
+
+    return thisLocationPasses;
   }
 
   componentDidUpdate(prevProps) {
@@ -385,18 +486,20 @@ class Locations extends Component {
 
   render() {
 
-    let currentQuery = new URLSearchParams(this.props.location.search);
-    let currentTerm = currentQuery.toString();
-
-    console.log(`[RENDER] prop q: ${this.props.location.search}`);
-    console.log(`[RENDER] Found term in render: ${currentTerm}, New query? ${this.state.newQuery}`);
-
     if ( !this.state.haveLocationData) {
-      console.log(`[RENDER] Fetch condition met! ${this.state.haveLocationData}`);
+      console.log(`[RENDER] Fetch condition met (!this.state.haveLocationData) ${this.state.haveLocationData}`);
       this.handleLookup();
+      return(
+        <h1>Loading...</h1>
+      );
     }
 
-    const locationGrid = this.state.locationList.map( (thisLocation,i) => {
+    console.log('STATE IN LOCATION RENDER:');
+    console.log(this.state);
+
+    let filteredLocations = this.state.locationListFull.filter(this.filterLocations);
+
+    const locationGrid = filteredLocations.map( (thisLocation,i) => {
       let thisKey = `location-${i}`;
       return (
         <div key={thisKey} className="col s3 location-item">
@@ -406,8 +509,9 @@ class Locations extends Component {
     });
 
     return(
-      <main title="List of Asheville Meal Sites" class="container mt-5 js-dependent no-print">
-        <div id="food-locations" class="row row-cols-1 row-cols-md-2 row-cols-lg-2 row-cols-xl-3 p-0">
+      <main title="List of Asheville Meal Sites" className="container mt-5 js-dependent no-print">
+        <FilterOptions activeFilters={this.state.activeFilters} options={this.state.filterOptions} changeHandler={this.submitQueryString} removeHandler={this.removeQueryParam} />
+        <div id="food-locations" className="row row-cols-1 row-cols-md-2 row-cols-lg-2 row-cols-xl-3 p-0">
           {locationGrid}
         </div>
       </main>
