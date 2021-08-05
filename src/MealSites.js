@@ -1,16 +1,18 @@
 import React, { Component } from 'react';
+// import { Link } from 'react-router-dom';
 import axios from 'axios';
 import moment from 'moment';
-import config from './config';
+import Banner from './Banner';
 import FilterOptions from './FilterOptions';
 import LocationCard from './LocationCard';
+import MapLayout from './MapLayout';
+import PrintLayout from './PrintLayout';
 
-class Locations extends Component {
+class MealSites extends Component {
   constructor(props) {
     super(props);
     this.state = {
       locationListFull: [],
-      locationListFiltered: [],
       activeFilters: {},
       filterOptions: {},
       filterSelectors: [],
@@ -19,21 +21,21 @@ class Locations extends Component {
   }
 
   handleLookup = () => {
-    axios.get(`${config.api_url}`)
+    axios.get(`${process.env.REACT_APP_ESRI_URL}`)
     .then(res => {
       let newActiveFilters = {};
       let locationsInitialized = this.processRawLocations(res.data.features);
 
-      console.log(locationsInitialized);
+      // console.log(locationsInitialized);
 
       let currentUrlParams = new URLSearchParams(this.props.location.search);
       let paramString = currentUrlParams.toString();
       if (paramString.length) {
-        console.log('INITIAL PARAM CHECK');
-        console.log(Object.keys(locationsInitialized.filterOptions));
+        // console.log('INITIAL PARAM CHECK');
+        // console.log(Object.keys(locationsInitialized.filterOptions));
         Object.keys(locationsInitialized.filterOptions).forEach( (filter) => {
-          console.log(`Key: ${filter}`);
-          console.log(currentUrlParams.getAll(filter));
+          // console.log(`Key: ${filter}`);
+          // console.log(currentUrlParams.getAll(filter));
           newActiveFilters[filter] = currentUrlParams.getAll(filter);
         });
       }
@@ -143,7 +145,8 @@ class Locations extends Component {
               filterOptions.areas.data.push(
               {
                 label: obj.attributes.generalArea,
-                value: sanitizedValue
+                value: sanitizedValue,
+                count: 0
               }
             );
           }
@@ -163,7 +166,8 @@ class Locations extends Component {
             filterOptions.types.data.push(
               {
                 label: typeLabel,
-                value: sanitizedValue
+                value: sanitizedValue,
+                count: 0
               }
             );
           }
@@ -177,7 +181,8 @@ class Locations extends Component {
               {
                 index: 0,
                 label: 'Monday',
-                value: 'day-mo'
+                value: 'day-mo',
+                count: 0
               }
             );  
           }
@@ -194,7 +199,8 @@ class Locations extends Component {
               {
                 index: 1,
                 label: 'Tuesday',
-                value: 'day-tu'
+                value: 'day-tu',
+                count: 0
               }
             );  
           }
@@ -211,7 +217,8 @@ class Locations extends Component {
               {
                 index: 2,
                 label: 'Wednesday',
-                value: 'day-we'
+                value: 'day-we',
+                count: 0
               }
             );  
           }
@@ -228,7 +235,8 @@ class Locations extends Component {
               {
                 index: 3,
                 label: 'Thursday',
-                value: 'day-th'
+                value: 'day-th',
+                count: 0
               }
             );  
           }
@@ -245,7 +253,8 @@ class Locations extends Component {
               {
                 index: 4,
                 label: 'Friday',
-                value: 'day-fr'
+                value: 'day-fr',
+                count: 0
               }
             );  
           }
@@ -262,7 +271,8 @@ class Locations extends Component {
               {
                 index: 5,
                 label: 'Saturday',
-                value: 'day-sa'
+                value: 'day-sa',
+                count: 0
               }
             );  
           }
@@ -279,7 +289,8 @@ class Locations extends Component {
               {
                 index: 6,
                 label: 'Sunday',
-                value: 'day-su'
+                value: 'day-su',
+                count: 0
               }
             );  
           }
@@ -415,6 +426,7 @@ class Locations extends Component {
     Object.keys(this.state.filterOptions).forEach( (filter) => {
       newActiveFilters[filter] = currentUrlParams.getAll(filter);
     });
+    e.target.options.selectedIndex = 0;
     this.setState({
       activeFilters: newActiveFilters
     });
@@ -453,32 +465,60 @@ class Locations extends Component {
     });
   }
 
-  filterLocations = (location) => {
+  applyFilters = () => {
+    
+    let filterOptionReset = JSON.parse(JSON.stringify(this.state.filterOptions));
 
-    let thisLocationPasses = true;
-    let termMatches = 0;
+    let filteredDataForOutput = {
+      locations: [],
+      filterOptions: filterOptionReset
+    }
 
-    Object.keys(this.state.activeFilters).forEach( (key, i) => {
+    filteredDataForOutput.locations = this.state.locationListFull.filter( (location) => {
 
-      if (this.state.activeFilters[key].length) {
+      let thisLocationPasses = true;
+      let termMatches = 0;
 
-        this.state.activeFilters[key].forEach( (term) => {
-          if (location.selectors.includes(term)) {
-            termMatches++;
+      Object.keys(this.state.activeFilters).forEach( (key, i) => {
+        if (this.state.activeFilters[key].length) {
+          this.state.activeFilters[key].forEach( (term) => {
+            if (location.selectors.includes(term)) {
+              termMatches++;
+            }
+          });
+          if (!termMatches) {
+            thisLocationPasses = false;
           }
-        });
-
-        if (!termMatches) {
-          thisLocationPasses = false;
+          termMatches = 0;
         }
-
-        termMatches = 0;
-      }
-
+      });
+      return thisLocationPasses;
     });
 
-    return thisLocationPasses;
+    // We've filtered out non-matches from the list. Now count matches for each filter option
+
+    filteredDataForOutput.locations.forEach( (location) => {
+
+      Object.keys(filteredDataForOutput.filterOptions).forEach( (key, i) => {
+        if (filteredDataForOutput.filterOptions[key].data.length) {
+          filteredDataForOutput.filterOptions[key].data.forEach( (termObject, i) => {
+            if (location.selectors.includes(termObject.value)) {
+              // console.log(`filtering! - ${location.selectors} - ${location.name} - ${termObject.value} --- ${filteredDataForOutput.filterOptions[key].data[i].count} inc`);
+              filteredDataForOutput.filterOptions[key].data[i].count++;
+            }
+          });
+        }
+      });
+
+    })
+
+    return filteredDataForOutput;
+
   }
+
+  // setFilterCounts = () => {
+
+  // }
 
   componentDidUpdate(prevProps) {
     console.log('DID update')
@@ -487,7 +527,7 @@ class Locations extends Component {
   render() {
 
     if ( !this.state.haveLocationData) {
-      console.log(`[RENDER] Fetch condition met (!this.state.haveLocationData) ${this.state.haveLocationData}`);
+      // console.log(`[RENDER] Fetch condition met (!this.state.haveLocationData) ${this.state.haveLocationData}`);
       this.handleLookup();
       return(
         <h1>Loading...</h1>
@@ -497,9 +537,18 @@ class Locations extends Component {
     console.log('STATE IN LOCATION RENDER:');
     console.log(this.state);
 
-    let filteredLocations = this.state.locationListFull.filter(this.filterLocations);
+    let currentUrlParams = new URLSearchParams(window.location.search);
+    let filtersApplied = this.applyFilters();
+    console.log('FILTERS APPLIED');
+    console.log(filtersApplied);
+    // let filtersApplied = this.state.locationListFull.filter(this.filterLocations);
 
-    const locationGrid = filteredLocations.map( (thisLocation,i) => {
+    // Take filtersApplied and compare against ALL filter options, counting for every match so "Filter Name (13)" type results can be shown
+    // Reset all filter count properties (actually, just copy from state where all are zero. then increment count value in copy, send copy to filter component as we render)
+    // Loop over all filtersApplied, and for each one:
+    // Loop over filters. For each filter match, increment that filter's count property
+
+    const locationGrid = filtersApplied.locations.map( (thisLocation,i) => {
       let thisKey = `location-${i}`;
       return (
         <div key={thisKey} className="col s3 location-item">
@@ -507,16 +556,56 @@ class Locations extends Component {
         </div>
       );
     });
+    console.log(`/print/?${currentUrlParams}`);
+    console.log(`++ ${this.props.match.params.view} ++`);
 
     return(
-      <main title="List of Asheville Meal Sites" className="container mt-5 js-dependent no-print">
-        <FilterOptions activeFilters={this.state.activeFilters} options={this.state.filterOptions} changeHandler={this.submitQueryString} removeHandler={this.removeQueryParam} />
-        <div id="food-locations" className="row row-cols-1 row-cols-md-2 row-cols-lg-2 row-cols-xl-3 p-0">
-          {locationGrid}
-        </div>
+      <main id="main" title="List of Asheville Meal Sites" className="h-100 js-dependent no-print">
+        
+        {(!this.props.match.params.view) &&
+          <div id="food-locations" className="h-100 container-fluid p-0 m-0">
+            <Banner />       
+          </div>        
+        }
+
+        {(this.props.match.params.view === 'cards') &&
+          <div className="container">
+            <FilterOptions activeFilters={this.state.activeFilters} options={filtersApplied.filterOptions} changeHandler={this.submitQueryString} removeHandler={this.removeQueryParam} />
+            <div id="food-locations" className="h-100 row row-cols-1 row-cols-md-2 row-cols-lg-2 row-cols-xl-3 p-0">
+              {locationGrid}
+            </div>        
+          </div>
+        }
+
+        {(this.props.match.params.view === 'print') &&
+          <div id="food-locations" className="h-100 container">
+            <FilterOptions activeFilters={this.state.activeFilters} options={filtersApplied.filterOptions} changeHandler={this.submitQueryString} removeHandler={this.removeQueryParam} />
+            <PrintLayout filteredLocations={filtersApplied.locations} />       
+          </div>        
+        }
+
+        {(this.props.match.params.view === 'map') &&
+          <div className="h-100 container-fluid px-0">
+            <div className="h-100 row m-0">
+              <div className="h-100 col-lg-6 d-none d-lg-block map-split-cards">
+                <div className="h-100 container p-0 m-0">
+                  <FilterOptions activeFilters={this.state.activeFilters} options={filtersApplied.filterOptions} context='map' changeHandler={this.submitQueryString} removeHandler={this.removeQueryParam} />
+                  <div id="food-locations" className="row row-cols-lg-1 row-cols-xl-1 row-cols-xxl-2 p-0 m-0">
+                    {locationGrid}
+                  </div>   
+                </div>
+              </div>
+              <div className="h-100 p-0 m-0 col xs-12 col-lg-6">
+                <div className="h-100 p-0 m-0 map-split">
+                  <MapLayout filteredLocations={filtersApplied.locations} filteredAreas={this.state.activeFilters.hasOwnProperty('areas') ? this.state.activeFilters.areas : []} />            
+                </div>
+              </div>
+            </div>
+          </div>
+        }
       </main>
     );
   }
 }
 
-export default Locations;
+export default MealSites;

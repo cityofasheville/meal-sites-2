@@ -1,11 +1,43 @@
+:root {
 
-.jumbotron {
-  background: url('./images/wood.jpg') no-repeat center center fixed;
+  --coa-blue-dark: #004987;
+  --coa-blue-med: #4077a5;
+  --coa-blue-light: #a6bfd4;
+
+  --coa-green-dark: #aaad00;
+  --coa-green-med: #bfc240;
+  --coa-green-light: #e1e2a6;
+
+  --coa-black: rgba(0,0,0,.93);  
+
+  --coa-platinum: #E6E8E6;
+}
+
+body {
+  padding: 0;
+  margin: 0;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+}
+
+.home-cover {
+  background: url('./images/mountains-cover.jpg') no-repeat center center fixed;
   background-size: cover;  
   opacity: 1;
   position: relative;
   padding: 12em 0; 
 }
+
+.jumbotron {
+  background: url('./images/mountains.jpg') no-repeat center center fixed;
+  background-size: cover;  
+  opacity: 1;
+  position: relative;
+  padding: 12em 0; 
+} 
 
 .jumbotron--text {
   z-index: 999;
@@ -18,7 +50,7 @@
   background-color: white;
   top: 50%;
   left: 50%;
-  transform: translate(-50%,-50%);
+  transform: translate(-50%,-75%);
   border: 2px solid black;
   border-radius: 15px;
   opacity: .83;
@@ -203,6 +235,21 @@ h3 {
   border-radius: 8px;
 }
 
+.service-icon-map.service-student, 
+.service-icon-map.service-delivery, 
+.service-icon-map.service-meal, 
+.service-icon-map.service-farmersmarket, 
+.service-icon-map.service-seniormeals, 
+.service-icon-map.service-ebtgroceries, 
+.service-icon-map.service-wicgroceries, 
+.service-icon-map.service-communitygardens, 
+.service-icon-map.service-foodbox {
+  font-size: 1rem;
+  padding: 2px;
+  margin-right: .25rem;
+  border-radius: 4px;
+}
+
 .service-student {
   color: purple;
   border: 1px solid purple;
@@ -296,4 +343,68 @@ h3 {
   width: 33.33%;
 }
 
-/* Previous CSS file */
+#main {
+  height: calc(100% - 75px);
+}
+
+.leaflet-container {
+  height: 100%;
+  width: 100%
+}
+
+.leaflet-div-icon {
+  background: transparent;
+  border: none;
+}  
+
+.card-body p[class*=" service-"] {
+  border: none;
+}
+
+.leaflet-marker-icon i {
+  background: white;
+  padding: 3px;
+}
+
+.card-body p[class*=" service-"] {
+  font-size: 1rem;
+}
+
+/* .card-map {
+  width: 500px;
+} */
+
+.bg-coa-blue {
+  background-color: var(--coa-blue-dark);
+}
+
+.nav-link-home {
+  font-size: 2rem;
+}
+
+.nav-print-option {
+  display: none;
+}
+
+@media (min-width: 992px) { 
+  .nav-print-option {
+    display: inline-block;
+  }
+}
+
+/* .btn-filter-control {
+  
+} */
+
+.nav-link-icon {
+  margin-right: .6rem;
+}
+
+.map-split-cards {
+  height: 100%;
+  overflow: scroll;
+}
+
+.flex-fill {
+  flex: 1 1 auto;
+}
