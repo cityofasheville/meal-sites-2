@@ -2,12 +2,47 @@ import React from 'react';
 
 function FilterDropdown(props) {
 
-  // This is a first crack at compiling already a list of ALL filters 
-  const optionListDropdown = props.filterOptions.data.map( (thisOption, i) => {
-    return (
-      <li key={i}><a class="dropdown-item" data-value={thisOption.value} href="#">{thisOption.label} ({thisOption.count})</a></li>
-    );
-  });
+  let activeTypeFilters, dropdownContainerClass = 'dropdown mx-2 mb-4 resource-filter';
+  
+  if (props.activeFilters.hasOwnProperty(props.filterName)) {
+    activeTypeFilters = props.activeFilters[props.filterName];
+    if (props.activeFilters[props.filterName].length) {
+      dropdownContainerClass += ' resource-filter--active';
+    }
+  } else {
+    activeTypeFilters = [];
+  }
+
+  const optionListDropdownAlt = props.filterOptions.data.reduce( (accumulator, currentOption, currentIndex) => {
+
+    let thisAction, thisActionLabel, thisButtonClass = 'dropdown-item ', showCount = true;
+
+    if (!activeTypeFilters.includes(currentOption.value)) {
+      thisAction = props.changeHandler;
+      thisActionLabel = 'Add the filter';
+
+      if(props.filterName === 'day') {
+        showCount = false;
+      }
+
+      accumulator.push(
+        <li key={currentIndex}>
+          <button 
+            data-filter-value={currentOption.value} 
+            data-filter-type={props.filterName} 
+            className={thisButtonClass} 
+            type="button" 
+            title={`${thisActionLabel} ${currentOption.label}`} 
+            onClick={thisAction}
+            >
+              {currentOption.label} 
+              {showCount ? ` (${currentOption.count})` : ''}
+          </button>
+        </li>
+      );
+    }
+    return accumulator;
+  }, []);
 
   let activeFiltersList = [];
 
@@ -20,7 +55,6 @@ function FilterDropdown(props) {
           matchingLabel = option.label;
         }
       });
-
       activeFiltersList.push({
         text: matchingLabel,
         value: filter
@@ -30,25 +64,36 @@ function FilterDropdown(props) {
 
   console.log(activeFiltersList);
 
-  // This is a first crack at compiling already active filters 
-  // (probably will instead want to display each filter only once, in either "add" or "remove" mode)
   const selectedFiltersDropdown = activeFiltersList.map( (filter, i) => {
-    return(
-    <li key={i}><a className="dropdown-item filter-button" href="#" data-filter-value={filter.value} data-filter-type={props.filterName} title="Click to remove this filter" onClick={props.removeHandler}>{filter.text}</a></li>
+    return (
+      <li key={i}>
+        <button 
+          data-filter-value={filter.value} 
+          data-filter-type={props.filterName} 
+          className="dropdown-item" 
+          type="button" 
+          title={`Remove the filter ${filter.text}`} 
+          onClick={props.removeHandler}
+          >
+            {filter.text} 
+            <i className="far fa-times-circle ms-2 icon-in-button"></i>
+        </button>
+      </li>
     );
   })
 
   return(
-    <div>
-      {/* 
-      TODO: 
-      - Bootstrap dropdown items for each filter type
-      - Set data attributes accordingly
-      - Figure out what click event looks like
-      - Rewrite submitQueryString() in MealSites
-      - Rewrite removeQueryParam() in MealSites
-      - Test for active filters; if found, alter the dropdown item to be a "remove" filter option instead of "add"
-      */}
+    <div className={dropdownContainerClass}>
+      <button className="btn btn-outline-dark dropdown-toggle" type="button" id={`dropdownMenuButton-${props.filterName}`} data-bs-toggle="dropdown" aria-expanded="false">
+        {props.filterOptions.filterHeader}
+      </button>
+      <ul className="dropdown-menu" aria-labelledby={`dropdownMenuButton-${props.filterName}`}>
+        {selectedFiltersDropdown}
+        {activeFiltersList.length > 0 &&
+          <li><hr className="dropdown-divider" /></li>
+        }
+        {optionListDropdownAlt}
+      </ul>
     </div>
   );
 }

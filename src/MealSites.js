@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
-// import { Link } from 'react-router-dom';
 import axios from 'axios';
 import moment from 'moment';
 import Banner from './Banner';
 import FilterOptions from './FilterOptions';
+import ResultsMeta from './ResultsMeta';
 import LocationCard from './LocationCard';
 import MapLayout from './MapLayout';
 import PrintLayout from './PrintLayout';
+import NavBar from './NavBar';
 
 class MealSites extends Component {
   constructor(props) {
@@ -16,6 +17,7 @@ class MealSites extends Component {
       activeFilters: {},
       filterOptions: {},
       filterSelectors: [],
+      showList: true,
       haveLocationData: false
     };
   }
@@ -25,20 +27,15 @@ class MealSites extends Component {
     .then(res => {
       let newActiveFilters = {};
       let locationsInitialized = this.processRawLocations(res.data.features);
-
-      // console.log(locationsInitialized);
-
       let currentUrlParams = new URLSearchParams(this.props.location.search);
       let paramString = currentUrlParams.toString();
+
       if (paramString.length) {
-        // console.log('INITIAL PARAM CHECK');
-        // console.log(Object.keys(locationsInitialized.filterOptions));
         Object.keys(locationsInitialized.filterOptions).forEach( (filter) => {
-          // console.log(`Key: ${filter}`);
-          // console.log(currentUrlParams.getAll(filter));
           newActiveFilters[filter] = currentUrlParams.getAll(filter);
         });
       }
+
       this.setState({
         filterOptions: locationsInitialized.filterOptions,
         filterSelectors: locationsInitialized.filterSelectors,
@@ -81,20 +78,20 @@ class MealSites extends Component {
 
     // Object will contain arrays of objects representing filter options
     let filterOptions = {
-      areas: {
-        filterHeader: 'Located in...',
+      area: {
+        filterHeader: 'Where Located',
         defaultDescription: 'Any Area',
         selectLabel: 'Choose Specific Location(s):',
         data: []
       },
-      days: {
-        filterHeader: 'Open on...',
+      day: {
+        filterHeader: 'When Open',
         defaultDescription: 'Any Day of the Week',
         selectLabel: 'Choose Specific Day(s) Open:',
         data: []
       },
-      types: {
-        filterHeader: 'Providing...',
+      type: {
+        filterHeader: 'Service Provided',
         defaultDescription: 'Any Service Type',
         selectLabel: 'Choose Specific Service(s) Offered:',
         data: []
@@ -110,13 +107,11 @@ class MealSites extends Component {
       filterSelectors: [],
       objectsProcessed: []
     };
-    // let foodLocationsHTML = '';
-    // let foodLocationsPrintHTML = '';
 
     for (let obj of data) {
 
     // NOTE: originally ditched foreach loop b/c we needed to break the loop on encountering empty row from spreadsheet
-    // since we started pulling more reliable data, can loop however you want 
+    // since we started pulling more reliable data, may revert to foreach if desired 
 
       cardSelectors = '';
 
@@ -141,8 +136,8 @@ class MealSites extends Component {
           sanitizedValue = 'area-' + obj.attributes.generalArea.toLowerCase().replace(/[^0-9a-z]/gi, '');
           cardSelectors += sanitizedValue + ' ';
   
-          if (filterOptions.areas.data.map(function(e) { return e.value; }).indexOf(sanitizedValue) < 0) {
-              filterOptions.areas.data.push(
+          if (filterOptions.area.data.map(function(e) { return e.value; }).indexOf(sanitizedValue) < 0) {
+              filterOptions.area.data.push(
               {
                 label: obj.attributes.generalArea,
                 value: sanitizedValue,
@@ -157,13 +152,13 @@ class MealSites extends Component {
           sanitizedValue = 'type-' + obj.attributes.type.toLowerCase().replace(/[^0-9a-z]/gi, '');
           cardSelectors += sanitizedValue + ' ';
   
-          if (filterOptions.types.data.map(function(e) { return e.value; }).indexOf(sanitizedValue) < 0) {
+          if (filterOptions.type.data.map(function(e) { return e.value; }).indexOf(sanitizedValue) < 0) {
             if (obj.attributes.type === 'Students') { 
               typeLabel = 'Student Meals' 
             } else {
               typeLabel = obj.attributes.type 
             }
-            filterOptions.types.data.push(
+            filterOptions.type.data.push(
               {
                 label: typeLabel,
                 value: sanitizedValue,
@@ -176,8 +171,8 @@ class MealSites extends Component {
         if (obj.attributes.mo) {
           cardSelectors += 'day-mo ';
           dayClassM = 'day-of-week--on';
-          if (filterOptions.days.data.map(function(e) { return e.value; }).indexOf('day-mo') < 0) {
-            filterOptions.days.data.push(
+          if (filterOptions.day.data.map(function(e) { return e.value; }).indexOf('day-mo') < 0) {
+            filterOptions.day.data.push(
               {
                 index: 0,
                 label: 'Monday',
@@ -194,8 +189,8 @@ class MealSites extends Component {
         if (obj.attributes.tu) {
           cardSelectors += 'day-tu ';
           dayClassT = 'day-of-week--on';
-          if (filterOptions.days.data.map(function(e) { return e.value; }).indexOf('day-tu') < 0) {
-            filterOptions.days.data.push(
+          if (filterOptions.day.data.map(function(e) { return e.value; }).indexOf('day-tu') < 0) {
+            filterOptions.day.data.push(
               {
                 index: 1,
                 label: 'Tuesday',
@@ -212,8 +207,8 @@ class MealSites extends Component {
         if (obj.attributes.we) {
           cardSelectors += 'day-we ';
           dayClassW = 'day-of-week--on';
-          if (filterOptions.days.data.map(function(e) { return e.value; }).indexOf('day-we') < 0) {
-            filterOptions.days.data.push(
+          if (filterOptions.day.data.map(function(e) { return e.value; }).indexOf('day-we') < 0) {
+            filterOptions.day.data.push(
               {
                 index: 2,
                 label: 'Wednesday',
@@ -230,8 +225,8 @@ class MealSites extends Component {
         if (obj.attributes.th) {
           cardSelectors += 'day-th ';
           dayClassTh = 'day-of-week--on';
-          if (filterOptions.days.data.map(function(e) { return e.value; }).indexOf('day-th') < 0) {
-            filterOptions.days.data.push(
+          if (filterOptions.day.data.map(function(e) { return e.value; }).indexOf('day-th') < 0) {
+            filterOptions.day.data.push(
               {
                 index: 3,
                 label: 'Thursday',
@@ -248,8 +243,8 @@ class MealSites extends Component {
         if (obj.attributes.fr) {
           cardSelectors += 'day-fr ';
           dayClassF = 'day-of-week--on';
-          if (filterOptions.days.data.map(function(e) { return e.value; }).indexOf('day-fr') < 0) {
-            filterOptions.days.data.push(
+          if (filterOptions.day.data.map(function(e) { return e.value; }).indexOf('day-fr') < 0) {
+            filterOptions.day.data.push(
               {
                 index: 4,
                 label: 'Friday',
@@ -266,8 +261,8 @@ class MealSites extends Component {
         if (obj.attributes.sa) {
           cardSelectors += 'day-sa ';
           dayClassSa = 'day-of-week--on';
-          if (filterOptions.days.data.map(function(e) { return e.value; }).indexOf('day-sa') < 0) {
-            filterOptions.days.data.push(
+          if (filterOptions.day.data.map(function(e) { return e.value; }).indexOf('day-sa') < 0) {
+            filterOptions.day.data.push(
               {
                 index: 5,
                 label: 'Saturday',
@@ -284,8 +279,8 @@ class MealSites extends Component {
         if (obj.attributes.su) {
           cardSelectors += 'day-su ';
           dayClassSu = 'day-of-week--on';
-          if (filterOptions.days.data.map(function(e) { return e.value; }).indexOf('day-su') < 0) {
-            filterOptions.days.data.push(
+          if (filterOptions.day.data.map(function(e) { return e.value; }).indexOf('day-su') < 0) {
+            filterOptions.day.data.push(
               {
                 index: 6,
                 label: 'Sunday',
@@ -382,22 +377,20 @@ class MealSites extends Component {
         objectsProcessed.push(obj.attributes);
         filterSelectors.push(thisObject);
   
-        // addCard(obj.attributes);
-
         objCount++;
-      } else {
-        // Objects will be skipped if outside date range, or if name is NULL
-        // console.log(`Skipping Record - ${obj.attributes.name} - ${obj.attributes.OBJECTID}`);
-      }
+      } 
+      // else {
+      //   // Objects will be skipped if outside date range, or if name is NULL
+      //   console.log(`** Skipping Record - ${obj.attributes.name} - ${obj.attributes.OBJECTID} - ${startDate} - ${endDate} **`);
+      // }
     }
 
     console.log(`-- Objects processed (${objCount}) --`);
-    // console.log(filterSelectors);
 
-    // Sort the options sensibly for display
-    filterOptions.areas.data.sort( (a,b) => a.label > b.label ? 1 : -1 );
-    filterOptions.types.data.sort( (a,b) => a.label > b.label ? 1 : -1 );
-    filterOptions.days.data.sort( (a,b) => a.index > b.index ? 1 : -1 )
+    // Sort the filter options sensibly for display
+    filterOptions.area.data.sort( (a,b) => a.label > b.label ? 1 : -1 );
+    filterOptions.type.data.sort( (a,b) => a.label > b.label ? 1 : -1 );
+    filterOptions.day.data.sort( (a,b) => a.index > b.index ? 1 : -1 )
 
     console.log('-- Initialization Complete --');
 
@@ -409,24 +402,31 @@ class MealSites extends Component {
   }
 
   submitQueryString = (e) => {
+
     e.preventDefault();
     let currentUrlParams = new URLSearchParams(window.location.search);
-    if (!currentUrlParams.has(e.target.dataset.filterType)) {
-      currentUrlParams.set(e.target.dataset.filterType, e.target[e.target.options.selectedIndex].value);
+    const newFilterValue = e.target.getAttribute("data-filter-value");
+    const newFilterType = e.target.getAttribute("data-filter-type");
+
+    console.log(`${newFilterValue} -- ${newFilterType}`);
+
+    if (!currentUrlParams.has(newFilterType)) {
+      currentUrlParams.set(newFilterType, newFilterValue);
       this.props.history.push(`?${currentUrlParams}`);
       console.log('Pushing history, component should update');
     } else {
-      if (currentUrlParams.getAll(e.target.dataset.filterType).indexOf(e.target[e.target.options.selectedIndex].value) < 0) {
-        currentUrlParams.append(e.target.dataset.filterType, e.target[e.target.options.selectedIndex].value);
+      if (currentUrlParams.getAll(newFilterType).indexOf(newFilterValue) < 0) {
+        currentUrlParams.append(newFilterType, newFilterValue);
         this.props.history.push(`?${currentUrlParams}`);
         console.log('Pushing history, component should update');
       }
     }
+
     let newActiveFilters = {};
     Object.keys(this.state.filterOptions).forEach( (filter) => {
       newActiveFilters[filter] = currentUrlParams.getAll(filter);
     });
-    e.target.options.selectedIndex = 0;
+
     this.setState({
       activeFilters: newActiveFilters
     });
@@ -435,21 +435,23 @@ class MealSites extends Component {
   removeQueryParam = (e) => {
 
     let currentUrlParams = new URLSearchParams(window.location.search);
+    const removeFilterValue = e.target.getAttribute("data-filter-value");
+    const removeFilterType = e.target.getAttribute("data-filter-type");
 
-    let currentTypeParams = currentUrlParams.getAll(e.target.dataset.filterType);
+    let currentTypeParams = currentUrlParams.getAll(removeFilterType);
     console.log(currentTypeParams);
 
     let remainingTypeParams = currentTypeParams.filter( (item) => {
-      return (item !== e.target.dataset.filterValue);
+      return (item !== removeFilterValue);
     });
 
     // Deletes ALL params of a type (maybe not what we want)
-    currentUrlParams.delete(e.target.dataset.filterType);
+    currentUrlParams.delete(removeFilterType);
 
     // If there was initially more than one param of the deleted type, add them back now
     if(remainingTypeParams.length) {
       remainingTypeParams.forEach( (param) => {
-        currentUrlParams.append(e.target.dataset.filterType, param);
+        currentUrlParams.append(removeFilterType, param);
       })
     }
 
@@ -466,6 +468,10 @@ class MealSites extends Component {
   }
 
   applyFilters = () => {
+
+    // TODO - Correct counts for filters that are part of multi-value facet (like day of week)
+    // Current counts work only for single value facets (like area or service type)
+    // Think of grocery stores - they often proide EBT and WIC (two service types)
     
     let filterOptionReset = JSON.parse(JSON.stringify(this.state.filterOptions));
 
@@ -477,90 +483,108 @@ class MealSites extends Component {
     filteredDataForOutput.locations = this.state.locationListFull.filter( (location) => {
 
       let thisLocationPasses = true;
+      let filterKeysFailed = [];
       let termMatches = 0;
 
-      Object.keys(this.state.activeFilters).forEach( (key, i) => {
-        if (this.state.activeFilters[key].length) {
-          this.state.activeFilters[key].forEach( (term) => {
+      Object.keys(this.state.activeFilters).forEach( (activeFilterKey, i) => {
+        if (this.state.activeFilters[activeFilterKey].length) {
+          this.state.activeFilters[activeFilterKey].forEach( (term) => {
             if (location.selectors.includes(term)) {
               termMatches++;
-            }
+            } 
           });
           if (!termMatches) {
             thisLocationPasses = false;
+            filterKeysFailed.push(activeFilterKey);
           }
           termMatches = 0;
         }
       });
-      return thisLocationPasses;
-    });
 
-    // We've filtered out non-matches from the list. Now count matches for each filter option
-
-    filteredDataForOutput.locations.forEach( (location) => {
-
-      Object.keys(filteredDataForOutput.filterOptions).forEach( (key, i) => {
-        if (filteredDataForOutput.filterOptions[key].data.length) {
-          filteredDataForOutput.filterOptions[key].data.forEach( (termObject, i) => {
-            if (location.selectors.includes(termObject.value)) {
-              // console.log(`filtering! - ${location.selectors} - ${location.name} - ${termObject.value} --- ${filteredDataForOutput.filterOptions[key].data[i].count} inc`);
-              filteredDataForOutput.filterOptions[key].data[i].count++;
+      // Following loop is to increment location count based on remaining locations
+      Object.keys(filteredDataForOutput.filterOptions).forEach( (allFilterOptionsKey, i) => {
+        if (filteredDataForOutput.filterOptions[allFilterOptionsKey].data.length) {
+          filteredDataForOutput.filterOptions[allFilterOptionsKey].data.forEach( (termObject, i) => {
+            let thisOptionLocationCounted = false;
+            let otherFacetFailures = 0;
+            filterKeysFailed.forEach( (failedKey, i) => {
+              if (failedKey !== allFilterOptionsKey) {
+                otherFacetFailures++;
+              }
+            });
+            if (location.selectors.includes(termObject.value) && !otherFacetFailures && !thisOptionLocationCounted) {
+              filteredDataForOutput.filterOptions[allFilterOptionsKey].data[i].count++;
+              thisOptionLocationCounted = true;
             }
           });
         }
       });
 
-    })
+      return thisLocationPasses; 
+    });
 
     return filteredDataForOutput;
-
   }
 
-  // setFilterCounts = () => {
+  toggleView = (e) => {
+    let toggleIcon = 'fas fa-angle-double-right me-1';
+    let toggleText = 'Show List';
 
-  // }
-
-  componentDidUpdate(prevProps) {
-    console.log('DID update')
+    if (!this.state.showList) {
+      toggleIcon = 'fas fa-angle-double-left me-1';
+      toggleText = 'Hide List';
+    }
+    document.getElementById("mapToggleButton").innerHTML = `<i class="${toggleIcon}" aria-hidden="true"></i> ${toggleText}`;
+    let toggledValue = !this.state.showList;
+    console.log(toggledValue);
+    this.setState({
+      showList: toggledValue
+    });
   }
 
   render() {
 
     if ( !this.state.haveLocationData) {
-      // console.log(`[RENDER] Fetch condition met (!this.state.haveLocationData) ${this.state.haveLocationData}`);
       this.handleLookup();
       return(
-        <h1>Loading...</h1>
+        <h1><i className="fas fa-spinner"></i>Loading...</h1>
       );
     }
 
-    console.log('STATE IN LOCATION RENDER:');
+    console.log('STATE IN MAIN RENDER:');
     console.log(this.state);
 
-    let currentUrlParams = new URLSearchParams(window.location.search);
     let filtersApplied = this.applyFilters();
     console.log('FILTERS APPLIED');
     console.log(filtersApplied);
-    // let filtersApplied = this.state.locationListFull.filter(this.filterLocations);
-
-    // Take filtersApplied and compare against ALL filter options, counting for every match so "Filter Name (13)" type results can be shown
-    // Reset all filter count properties (actually, just copy from state where all are zero. then increment count value in copy, send copy to filter component as we render)
-    // Loop over all filtersApplied, and for each one:
-    // Loop over filters. For each filter match, increment that filter's count property
 
     const locationGrid = filtersApplied.locations.map( (thisLocation,i) => {
       let thisKey = `location-${i}`;
       return (
-        <div key={thisKey} className="col s3 location-item">
+        <div key={thisKey} className="location-item">
             <LocationCard location={thisLocation} />
         </div>
       );
     });
-    console.log(`/print/?${currentUrlParams}`);
-    console.log(`++ ${this.props.match.params.view} ++`);
+
+    let listContainerClasslist = 'h-100 col-xs-12 col-lg-6 col-xl-7 col-xxl-6 map-split-cards';
+    let mapContainerClasslist = 'h-100 p-0 m-0 col-lg-6 col-xl-5 col-xxl-6 d-none d-lg-block';
+    
+    if (!this.state.showList) {
+      listContainerClasslist = 'h-100 d-none map-split-cards';
+      mapContainerClasslist = 'h-100 p-0 m-0 col-xs-12';      
+    }
 
     return(
-      <main id="main" title="List of Asheville Meal Sites" className="h-100 js-dependent no-print">
+      <main id="main" title="List of Asheville Meal Sites" className="js-dependent no-print">
+
+        <NavBar 
+          activeFilters={this.state.activeFilters} 
+          options={filtersApplied.filterOptions} 
+          context='map' 
+          changeHandler={this.submitQueryString} 
+          removeHandler={this.removeQueryParam} 
+        />
         
         {(!this.props.match.params.view) &&
           <div id="food-locations" className="h-100 container-fluid p-0 m-0">
@@ -568,18 +592,8 @@ class MealSites extends Component {
           </div>        
         }
 
-        {(this.props.match.params.view === 'cards') &&
-          <div className="container">
-            <FilterOptions activeFilters={this.state.activeFilters} options={filtersApplied.filterOptions} changeHandler={this.submitQueryString} removeHandler={this.removeQueryParam} />
-            <div id="food-locations" className="h-100 row row-cols-1 row-cols-md-2 row-cols-lg-2 row-cols-xl-3 p-0">
-              {locationGrid}
-            </div>        
-          </div>
-        }
-
         {(this.props.match.params.view === 'print') &&
           <div id="food-locations" className="h-100 container">
-            <FilterOptions activeFilters={this.state.activeFilters} options={filtersApplied.filterOptions} changeHandler={this.submitQueryString} removeHandler={this.removeQueryParam} />
             <PrintLayout filteredLocations={filtersApplied.locations} />       
           </div>        
         }
@@ -587,23 +601,54 @@ class MealSites extends Component {
         {(this.props.match.params.view === 'map') &&
           <div className="h-100 container-fluid px-0">
             <div className="h-100 row m-0">
-              <div className="h-100 col-lg-6 d-none d-lg-block map-split-cards">
-                <div className="h-100 container p-0 m-0">
-                  <FilterOptions activeFilters={this.state.activeFilters} options={filtersApplied.filterOptions} context='map' changeHandler={this.submitQueryString} removeHandler={this.removeQueryParam} />
-                  <div id="food-locations" className="row row-cols-lg-1 row-cols-xl-1 row-cols-xxl-2 p-0 m-0">
+              <div className={listContainerClasslist}>
+                <div className="h-100 p-0 m-0">
+                  <div className="m-0 p-0">
+                    <button className="mx-0 d-inline-block d-lg-none btn btn-light border-dark button-view-toggle" onClick={this.toggleView}>
+                      <i className="fa fa-map-o nav-link-icon" aria-hidden="true"></i>Show Map
+                    </button>
+                  </div>
+                  <div className="row row-cols-xs-1 mx-0 mt-4 px-4">
+                    <ResultsMeta resultsCount={filtersApplied.locations.length} options={filtersApplied.filterOptions} activeFilters={this.state.activeFilters} removeHandler={this.removeQueryParam} />                    
+                  </div>
+                  <div id="food-locations" className="row row-cols-xs-1 row-cols-md-2 row-cols-lg-1 row-cols-xl-2 p-0 m-0">
                     {locationGrid}
-                  </div>   
+                  </div>  
                 </div>
               </div>
-              <div className="h-100 p-0 m-0 col xs-12 col-lg-6">
+              <div className={mapContainerClasslist}>
                 <div className="h-100 p-0 m-0 map-split">
-                  <MapLayout filteredLocations={filtersApplied.locations} filteredAreas={this.state.activeFilters.hasOwnProperty('areas') ? this.state.activeFilters.areas : []} />            
+                  <MapLayout showList={this.state.showList} toggleHandler={this.toggleView} filteredLocations={filtersApplied.locations} filteredAreas={this.state.activeFilters.hasOwnProperty('area') ? this.state.activeFilters.area : []} />            
                 </div>
               </div>
             </div>
           </div>
         }
+
+        <div className="modal fade" id="filtersModal" tabIndex="-1" aria-labelledby="filtersModalLabel" aria-hidden="true" data-bs-keyboard="true" data-bs-focus="true">
+          <div className="modal-dialog modal-lg mt-4">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title" id="filtersModalLabel">Adjust Filters</h5>
+                <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div className="modal-body">
+                <FilterOptions 
+                  activeFilters={this.state.activeFilters} 
+                  options={filtersApplied.filterOptions} 
+                  context='map' 
+                  changeHandler={this.submitQueryString} 
+                  removeHandler={this.removeQueryParam} 
+                />
+              </div>
+              <div className="modal-footer">
+                <button type="button" className="btn btn-outline-dark px-5" data-bs-dismiss="modal">Done</button>
+              </div>
+            </div>
+          </div>
+        </div>
       </main>
+      
     );
   }
 }

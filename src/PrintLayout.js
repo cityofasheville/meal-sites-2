@@ -12,7 +12,7 @@ function PrintLayout(props) {
   return(
     <main title="List of Asheville Meal Sites - Printable Layout" className="container-fluid mt-5 js-dependent print-view">
       <table id="food-locations-print" width="100%" className="table-print">
-        <caption>List of Asheville Meal Sites - Printable Layout</caption>
+        <caption>List of Asheville Food Resources - Printable Layout</caption>
         <thead>
           <tr>
             <th scope="col">Location and Service</th>

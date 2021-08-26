@@ -3,20 +3,36 @@ import { NavLink } from 'react-router-dom';
 function NavBar(props) {
 
   let currentUrlParams = new URLSearchParams(window.location.search);
+  console.log(`Router L0cation +${window.location.pathname}+`);
 
   return(
-    <nav className="navbar navbar-expand-lg navbar-dark bg-coa-blue">
+    <nav className="navbar navbar-expand navbar-dark bg-coa-blue">
       <div className="container-fluid">
-        <NavLink className="navbar-brand nav-link-home" exact activeClassName="active" to={`/`}>Meal Sites</NavLink>
-        {/* <a className="navbar-brand" href="#"></a> */}
-        <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-          <span className="navbar-toggler-icon"></span>
-        </button>
-        <div className="collapse navbar-collapse" id="navbarNavAltMarkup">
+        <div className="navbar-brand nav-link-home">
+          <i className="fas fa-map-marked-alt me-3 font-weight-light" title="Asheville Food Resources"></i>
+          <span className="d-none d-md-inline-block font-weight-light">Food Resource Map</span>
+        </div>
+        <div className="collapse navbar-collapse " id="navbarNavAltMarkup">
           <div className="navbar-nav">
-            <NavLink className="nav-link mx-3" activeClassName="active" to={`/map/?${currentUrlParams}`}><i class="fa fa-map-o nav-link-icon" aria-hidden="true"></i>Map</NavLink>
-            <NavLink className="nav-link mx-3" activeClassName="active" to={`/cards/?${currentUrlParams}`}><i class="fa fa-list-alt nav-link-icon" aria-hidden="true"></i>Cards</NavLink>
-            <NavLink className="nav-link mx-3 nav-print-option" activeClassName="active" to={`/print/?${currentUrlParams}`}><i class="fa fa-print nav-link-icon" aria-hidden="true"></i>Print</NavLink>
+            {window.location.pathname !== '/' &&
+              <button type="button" className="btn btn-link nav-link ms-4 active button-filter__trigger" data-bs-toggle="modal" data-bs-target="#filtersModal">
+                <i className="fa fa-filter nav-link-icon" aria-hidden="true"></i>Filter Results
+              </button>            
+            }
+            {window.location.pathname.startsWith('/print/') &&
+              <NavLink 
+                className="nav-link mx-4 active" 
+                to={`/map/?${currentUrlParams}`}>
+                  <i className="fa fa-map-o nav-link-icon" aria-hidden="true"></i>Map View
+              </NavLink>
+            }
+            {window.location.pathname.startsWith('/map/') && 
+              <NavLink 
+                className="nav-link mx-4 nav-print-option active" 
+                to={`/print/?${currentUrlParams}`}>
+                  <i className="fa fa-print nav-link-icon" aria-hidden="true"></i>Print View
+              </NavLink>
+            }
           </div>
         </div>
       </div>

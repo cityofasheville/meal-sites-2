@@ -11,6 +11,16 @@
   --coa-black: rgba(0,0,0,.93);  
 
   --coa-platinum: #E6E8E6;
+
+  --coa-day-of-week-open: rgba(135, 199, 70, .5);
+}
+
+html {
+  box-sizing: border-box;
+}
+
+*, *:before, *:after {
+  box-sizing: inherit;
 }
 
 body {
@@ -324,7 +334,8 @@ h3 {
 }
 
 .day-of-week--on {
-  background-color: rgba(135, 199, 70, .5);
+  /* background-color: rgba(135, 199, 70, .5); */
+  background-color: var(--coa-day-of-week-open);
 }
 
 .day-of-week--off {
@@ -392,19 +403,95 @@ h3 {
   }
 }
 
-/* .btn-filter-control {
-  
-} */
+.full-width .resource-filter {
+  flex: 1;
+  justify-content: space-between;
+}
+
+.resource-filter .btn {
+  width: 100%;
+}
 
 .nav-link-icon {
   margin-right: .6rem;
 }
 
+.button-filter__trigger,
+.button-filter__trigger:active,
+.button-filter__trigger:focus,
+.button-filter__trigger:visited {
+  background-color: var(--coa-blue-dark);
+  color: white;
+  border: 1px solid var(--coa-platinum);
+}
+
+.button-filter__trigger:hover {
+  background-color: var(--coa-platinum);
+  color: var(--coa-blue-dark) !important;
+  border: 1px solid var(--coa-blue-med);
+}
+
+.button-filter__remove {
+  background-color: var(--coa-platinum);
+}
+
+.btn.button-view-toggle {
+  margin-left: 16px;
+  margin-top: 16px;
+}
+
+/* .btn.baz {
+  margin-left: 20px;
+  margin-top: 20px;
+} */
+
+.button-view-toggle:hover {
+  background-color: var(--coa-platinum);
+}
+
+/* 
+  Hide scrollbar for overflow (not doing at the moment - usability over pretty)
+  https://stackoverflow.com/a/49278385 
+*/
 .map-split-cards {
-  height: 100%;
-  overflow: scroll;
+  overflow-y: scroll;
 }
 
 .flex-fill {
   flex: 1 1 auto;
+}
+
+.table-print td {
+  break-inside: avoid;
+}
+
+.icon-in-button {
+  pointer-events: none;
+}
+
+/* .resource-filter {
+  border: 2px solid transparent;
+  border-radius: 6px;
+} */
+
+.resource-filter--active:after {
+  content: '';
+  display: block;
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  left: -4px;
+  right: -4px;
+  border: 2px solid green;
+  border-radius: 6px;
+  pointer-events: none;
+}
+
+.location-card-popup {
+  margin: 32px 0;
+}
+
+.accordion-button:not(.collapsed) {
+  color: var(--coa-black);
+  background-color: transparent;
 }
