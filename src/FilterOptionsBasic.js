@@ -2,7 +2,7 @@ import React from 'react';
 import FilterCard from './FilterCard';
 
 function FilterOptions(props) {
-  console.log(props);
+  // console.log(props);
   const filterKeys = Object.keys(props.options);
   const filterCardSet = filterKeys.map( (key, i) => {
     let thisKey = `filtercard-${i}`;

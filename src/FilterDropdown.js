@@ -62,7 +62,7 @@ function FilterDropdown(props) {
     });
   }
 
-  console.log(activeFiltersList);
+  // console.log(activeFiltersList);
 
   const selectedFiltersDropdown = activeFiltersList.map( (filter, i) => {
     return (
@@ -76,7 +76,7 @@ function FilterDropdown(props) {
           onClick={props.removeHandler}
           >
             {filter.text} 
-            <i className="far fa-times-circle ms-2 icon-in-button"></i>
+            <i className="far fa-times-circle ms-2 icon-in-button" aria-hidden="true"></i>
         </button>
       </li>
     );

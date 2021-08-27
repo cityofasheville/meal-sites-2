@@ -25,7 +25,7 @@ function ResultsMeta(props) {
             title={`Remove the filter ${filterLabel.label}`} 
             onClick={props.removeHandler}
             >
-              {filterLabel.label} <i className="fa fa-close ms-2 icon-in-button"></i>
+              {filterLabel.label} <i className="fa fa-close ms-2 icon-in-button" aria-hidden="true"></i>
           </button>
         )
       });
@@ -38,7 +38,7 @@ function ResultsMeta(props) {
 
   return(
     <div className="ps-0">
-      <h2 className="mb-0 me-3"><i class="fas fa-map-marker-alt me-2"></i>{props.resultsCount} resources found
+      <h2 className="mb-0 me-3"><i className="fas fa-map-marker-alt me-2" aria-hidden="true"></i>{props.resultsCount} resources found
       </h2>
       <div className="my-3">
         {removeFilterButtons}

@@ -20,6 +20,7 @@ class MapLayout extends React.Component {
     // Need the leaflet container to re-size itself when "show/hide list" toggle happens
     if (this.mapRef !== null) {
       this.mapRef.invalidateSize();
+      console.log('Invalidating Map Size');
     }
   }
 
@@ -90,7 +91,7 @@ class MapLayout extends React.Component {
         whenCreated={map => {
           // https://sean-rennie.medium.com/migrating-react-leaflet-from-v2-to-v3-12d6088af191 (explains new ref-less map control options)
           // https://github.com/PaulLeCam/react-leaflet/issues/841#issuecomment-779048091 (example of using whenCreated prop of MapContainer)
-          console.log('trying to invalidate')
+          console.log('Map whenCreated');
           this.mapRef = map;
         }}
         >

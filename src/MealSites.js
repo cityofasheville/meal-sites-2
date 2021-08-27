@@ -408,17 +408,17 @@ class MealSites extends Component {
     const newFilterValue = e.target.getAttribute("data-filter-value");
     const newFilterType = e.target.getAttribute("data-filter-type");
 
-    console.log(`${newFilterValue} -- ${newFilterType}`);
+    console.log(`Filter Added: ${newFilterValue} -- ${newFilterType}`);
 
     if (!currentUrlParams.has(newFilterType)) {
       currentUrlParams.set(newFilterType, newFilterValue);
       this.props.history.push(`?${currentUrlParams}`);
-      console.log('Pushing history, component should update');
+      // console.log('Pushing history, component should update');
     } else {
       if (currentUrlParams.getAll(newFilterType).indexOf(newFilterValue) < 0) {
         currentUrlParams.append(newFilterType, newFilterValue);
         this.props.history.push(`?${currentUrlParams}`);
-        console.log('Pushing history, component should update');
+        // console.log('Pushing history, component should update');
       }
     }
 
@@ -439,7 +439,7 @@ class MealSites extends Component {
     const removeFilterType = e.target.getAttribute("data-filter-type");
 
     let currentTypeParams = currentUrlParams.getAll(removeFilterType);
-    console.log(currentTypeParams);
+    // console.log(currentTypeParams);
 
     let remainingTypeParams = currentTypeParams.filter( (item) => {
       return (item !== removeFilterValue);
@@ -456,7 +456,7 @@ class MealSites extends Component {
     }
 
     this.props.history.push(`?${currentUrlParams}`);
-    console.log('Pushing history, component should update');
+    // console.log('Pushing history, component should update');
 
     let newActiveFilters = {};
     Object.keys(this.state.filterOptions).forEach( (filter) => {
@@ -472,6 +472,7 @@ class MealSites extends Component {
     // TODO - Correct counts for filters that are part of multi-value facet (like day of week)
     // Current counts work only for single value facets (like area or service type)
     // Think of grocery stores - they often proide EBT and WIC (two service types)
+    // While checking a filter, see if any other filters of the same type have already been applied, and subtract the count of those
     
     let filterOptionReset = JSON.parse(JSON.stringify(this.state.filterOptions));
 
@@ -536,7 +537,7 @@ class MealSites extends Component {
     }
     document.getElementById("mapToggleButton").innerHTML = `<i class="${toggleIcon}" aria-hidden="true"></i> ${toggleText}`;
     let toggledValue = !this.state.showList;
-    console.log(toggledValue);
+    // console.log(toggledValue);
     this.setState({
       showList: toggledValue
     });
@@ -547,7 +548,17 @@ class MealSites extends Component {
     if ( !this.state.haveLocationData) {
       this.handleLookup();
       return(
-        <h1><i className="fas fa-spinner"></i>Loading...</h1>
+        <main id="main" title="List of Asheville Meal Sites" className="js-dependent no-print">
+          
+          <NavBar />
+
+          <div className="h-100 d-flex justify-content-center py-5 border-dark">
+            <div className="spinner-border" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </div>
+          </div>
+
+        </main>
       );
     }
 
@@ -576,79 +587,77 @@ class MealSites extends Component {
     }
 
     return(
-      <main id="main" title="List of Asheville Meal Sites" className="js-dependent no-print">
+      <>
+        <header>
+          <NavBar />
+        </header>
 
-        <NavBar 
-          activeFilters={this.state.activeFilters} 
-          options={filtersApplied.filterOptions} 
-          context='map' 
-          changeHandler={this.submitQueryString} 
-          removeHandler={this.removeQueryParam} 
-        />
-        
-        {(!this.props.match.params.view) &&
-          <div id="food-locations" className="h-100 container-fluid p-0 m-0">
-            <Banner />       
-          </div>        
-        }
+        <main id="main" title="Asheville Area Food Resources">
+          
+          {(!this.props.match.params.view) &&
+            <section id="introBanner" title="About This Site" className="h-100 container-fluid p-0 m-0">
+              <Banner />       
+            </section>        
+          }
 
-        {(this.props.match.params.view === 'print') &&
-          <div id="food-locations" className="h-100 container">
-            <PrintLayout filteredLocations={filtersApplied.locations} />       
-          </div>        
-        }
+          {(this.props.match.params.view === 'print') &&
+            <section id="foodLocationsPrint" title="Print friendly list of resources" className="h-100 container">
+              <PrintLayout filteredLocations={filtersApplied.locations} />       
+            </section>        
+          }
 
-        {(this.props.match.params.view === 'map') &&
-          <div className="h-100 container-fluid px-0">
-            <div className="h-100 row m-0">
-              <div className={listContainerClasslist}>
-                <div className="h-100 p-0 m-0">
-                  <div className="m-0 p-0">
-                    <button className="mx-0 d-inline-block d-lg-none btn btn-light border-dark button-view-toggle" onClick={this.toggleView}>
-                      <i className="fa fa-map-o nav-link-icon" aria-hidden="true"></i>Show Map
-                    </button>
-                  </div>
-                  <div className="row row-cols-xs-1 mx-0 mt-4 px-4">
-                    <ResultsMeta resultsCount={filtersApplied.locations.length} options={filtersApplied.filterOptions} activeFilters={this.state.activeFilters} removeHandler={this.removeQueryParam} />                    
-                  </div>
-                  <div id="food-locations" className="row row-cols-xs-1 row-cols-md-2 row-cols-lg-1 row-cols-xl-2 p-0 m-0">
-                    {locationGrid}
-                  </div>  
+          {(this.props.match.params.view === 'map') &&
+            <div className="h-100 container-fluid px-0">
+              <div className="h-100 row m-0">
+                <div className={listContainerClasslist}>
+                  <section title="List of resources" className="h-100 p-0 m-0">
+                    <div className="m-0 p-0">
+                      <button className="mx-0 d-inline-block d-lg-none btn btn-light border-dark button-view-toggle" onClick={this.toggleView}>
+                        <i className="fa fa-map-o nav-link-icon" aria-hidden="true"></i>Show Map
+                      </button>
+                    </div>
+                    <div className="row row-cols-xs-1 mx-0 mt-4 px-4">
+                      <ResultsMeta resultsCount={filtersApplied.locations.length} options={filtersApplied.filterOptions} activeFilters={this.state.activeFilters} removeHandler={this.removeQueryParam} />                    
+                    </div>
+                    <div id="foodLocationsList" className="row row-cols-xs-1 row-cols-md-2 row-cols-lg-1 row-cols-xl-2 p-0 m-0">
+                      {locationGrid}
+                    </div>  
+                  </section>
                 </div>
+                <section title="Map of resources" className={mapContainerClasslist}>
+                  <div className="h-100 p-0 m-0 map-split">
+                    <MapLayout showList={this.state.showList} toggleHandler={this.toggleView} filteredLocations={filtersApplied.locations} filteredAreas={this.state.activeFilters.hasOwnProperty('area') ? this.state.activeFilters.area : []} />            
+                  </div>
+                </section>
               </div>
-              <div className={mapContainerClasslist}>
-                <div className="h-100 p-0 m-0 map-split">
-                  <MapLayout showList={this.state.showList} toggleHandler={this.toggleView} filteredLocations={filtersApplied.locations} filteredAreas={this.state.activeFilters.hasOwnProperty('area') ? this.state.activeFilters.area : []} />            
+            </div>
+          }
+
+          <aside title="Dialog to adjust filter options" className="modal fade" id="filtersModal" tabIndex="-1" aria-labelledby="filtersModalLabel" aria-hidden="true" data-bs-keyboard="true" data-bs-focus="true">
+            <div className="modal-dialog modal-lg mt-4">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title" id="filtersModalLabel">Adjust Filters</h5>
+                  <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div className="modal-body">
+                  <FilterOptions 
+                    activeFilters={this.state.activeFilters} 
+                    options={filtersApplied.filterOptions} 
+                    context='map' 
+                    changeHandler={this.submitQueryString} 
+                    removeHandler={this.removeQueryParam} 
+                  />
+                </div>
+                <div className="modal-footer">
+                  <button type="button" className="btn btn-outline-dark px-5" data-bs-dismiss="modal">Done</button>
                 </div>
               </div>
             </div>
-          </div>
-        }
+          </aside>
 
-        <div className="modal fade" id="filtersModal" tabIndex="-1" aria-labelledby="filtersModalLabel" aria-hidden="true" data-bs-keyboard="true" data-bs-focus="true">
-          <div className="modal-dialog modal-lg mt-4">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title" id="filtersModalLabel">Adjust Filters</h5>
-                <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
-              <div className="modal-body">
-                <FilterOptions 
-                  activeFilters={this.state.activeFilters} 
-                  options={filtersApplied.filterOptions} 
-                  context='map' 
-                  changeHandler={this.submitQueryString} 
-                  removeHandler={this.removeQueryParam} 
-                />
-              </div>
-              <div className="modal-footer">
-                <button type="button" className="btn btn-outline-dark px-5" data-bs-dismiss="modal">Done</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </main>
-      
+        </main>
+      </>
     );
   }
 }

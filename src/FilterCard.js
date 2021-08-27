@@ -42,7 +42,7 @@ function FilterCard(props) {
     });
   }
 
-  console.log(activeFiltersList);
+  // console.log(activeFiltersList);
 
   const selectedFilters = activeFiltersList.map( (filter, i) => {
     return(<li key={i} className="list-group-item filter-button" data-filter-value={filter.value} data-filter-type={props.filterName} title="Click to remove this filter" onClick={props.removeHandler}>{filter.text}</li>);
