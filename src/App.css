@@ -368,6 +368,10 @@ h3 {
   border: none;
 }  
 
+.leaflet-popup-content {
+  margin: 0 4px;
+}
+
 .card-body p[class*=" service-"] {
   border: none;
 }
@@ -393,7 +397,7 @@ h3 {
   font-size: 2rem;
 }
 
-.nav-print-option {
+/* .nav-print-option {
   display: none;
 }
 
@@ -401,7 +405,7 @@ h3 {
   .nav-print-option {
     display: inline-block;
   }
-}
+} */
 
 .full-width .resource-filter {
   flex: 1;
@@ -494,4 +498,39 @@ h3 {
 .accordion-button:not(.collapsed) {
   color: var(--coa-black);
   background-color: transparent;
+}
+
+td, th {
+  vertical-align: middle;
+}
+
+@media print {
+
+  body {
+    width: 21.59cm;
+    height: 27.94cm;
+    /* margin: 15mm 20mm 15mm 20mm;  */
+    /* change the margins as you want them to be. */
+   } 
+
+  tr {
+    page-break-inside: avoid;
+  }
+
+  header {
+    display: none;
+  }
+
+  td, th, .icon-print {
+    font-size: .8rem;
+  }
+
+  td {
+    min-width: 6cm;
+  }
+
+  .print-days-column {
+    min-width: 7cm;
+  }
+
 }

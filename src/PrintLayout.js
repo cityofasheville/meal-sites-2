@@ -11,13 +11,13 @@ function PrintLayout(props) {
   
   return(
     <main title="List of Asheville Meal Sites - Printable Layout" className="container-fluid mt-5 js-dependent print-view">
-      <table id="food-locations-print" width="100%" className="table-print">
+      <table id="food-locations-print" width="100%" className="table table-bordered">
         <caption>List of Asheville Food Resources - Printable Layout</caption>
         <thead>
           <tr>
-            <th scope="col">Location and Service</th>
-            <th scope="col">Schedule</th>
-            <th scope="col">Location</th>
+            <th className="px-3 print-name-column" scope="col">Location and Service</th>
+            <th className="px-3 print-days-column" scope="col">Schedule</th>
+            <th className="px-3 print-location-column" scope="col">Location</th>
           </tr>
 
           {(props.filteredLocations.length === 0) &&

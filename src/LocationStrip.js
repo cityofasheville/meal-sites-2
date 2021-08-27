@@ -16,8 +16,8 @@ function LocationCard(props) {
 
   return(
     <tr className={`all-objects object-${props.location.OBJECTID} ${props.location.selectors}`}>
-      <td><h3>{props.location.name}</h3><i className={iconClass}></i> {props.location.type === 'Students' ? 'Student Meals' : props.location.type}</td>
-      <td>
+      <td className="px-3"><h3>{props.location.name}</h3><i className={`${iconClass} icon-print`} aria-hidden="true"></i> {props.location.type === 'Students' ? 'Student Meals' : props.location.type}</td>
+      <td className="px-3">
         <ul className="week-list week-list--print" aria-label="Days of the week">
           <li className={`day-of-week ${props.location.styleM}`} title={`${props.location.name} ${props.location.type} service is ${props.location.styleM === 'day-of-week--on' ? 'open' : 'closed'} on Monday`}><span className="day-label">M</span></li>
           <li className={`day-of-week ${props.location.styleT}`} title={`${props.location.name} ${props.location.type} service is ${props.location.styleT === 'day-of-week--on' ? 'open' : 'closed'} on Tuesday`}><span className="day-label">T</span></li>
@@ -29,7 +29,7 @@ function LocationCard(props) {
         </ul>
         {props.location.hoursOpen} | {props.location.daysOpen}
       </td>
-      <td>Area: {props.location.generalArea}<br /><a className="map-link text-dark" href={`https://www.google.com/maps/search/${q}`} title={`View location of ${props.location.name} on a Google Map`} target="_blank" rel="noopener noreferrer">Location</a>: {props.location.address}</td>
+      <td className="px-3">Area: {props.location.generalArea}<br /><a className="map-link text-dark" href={`https://www.google.com/maps/search/${q}`} title={`View location of ${props.location.name} on a Google Map in a new browser tab`} target="_blank" rel="noopener noreferrer">Location</a>: {props.location.address}</td>
     </tr>
   )
 }

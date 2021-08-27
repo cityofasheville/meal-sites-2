@@ -2,7 +2,7 @@ import React from 'react';
 import FilterDropdown from './FilterDropdown';
 
 function FilterOptions(props) {
-  console.log(props);
+  // console.log(props);
   const filterKeys = Object.keys(props.options);
   const filterDropdownSet = filterKeys.map( (key, i) => {
     let thisKey = `filterdropdown-${i}`;

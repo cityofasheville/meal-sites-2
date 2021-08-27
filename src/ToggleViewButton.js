@@ -2,6 +2,9 @@ import React from "react";
 import { useMap } from "react-leaflet";
 import L from "leaflet";
 
+// Got this logic/idea from the website below:
+// https://codesandbox.io/s/react-leaflet-description-button-o66nb?file=/src/Description.js
+
 class ToggleViewButton extends React.Component {
   helpDiv;
 
@@ -11,7 +14,7 @@ class ToggleViewButton extends React.Component {
         const helpDiv = L.DomUtil.create("button", "");
         this.helpDiv = helpDiv;
         helpDiv.id = 'mapToggleButton';
-        helpDiv.innerHTML = `<i class="${this.props.icon}"></i> ${this.props.title}`;
+        helpDiv.innerHTML = `<i class="${this.props.icon}" aria-hidden="true"></i> ${this.props.title}`;
         helpDiv.classList.add("btn", "btn-light", "border-dark", "button-view-toggle");
         helpDiv.addEventListener("click", this.props.toggleHandler);
 
