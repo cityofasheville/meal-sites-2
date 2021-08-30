@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import moment from 'moment';
-import 'url-search-params-polyfill';
 import Banner from './Banner';
 import FilterOptions from './FilterOptions';
 import ResultsMeta from './ResultsMeta';
