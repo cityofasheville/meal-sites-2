@@ -502,6 +502,11 @@ h3 {
 
 td, th {
   vertical-align: middle;
+  width: 33%;
+}
+
+.print-days-column {
+  min-width: 270px;
 }
 
 @media print {

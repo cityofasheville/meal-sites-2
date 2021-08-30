@@ -2,12 +2,13 @@ import React from 'react';
 
 function FilterDropdown(props) {
 
-  let activeTypeFilters, dropdownContainerClass = 'dropdown mx-2 mb-4 resource-filter';
+  let activeTypeFilters, dropdownContainerClass = 'dropdown mx-2 mb-4 resource-filter', extraCountText = '';
   
   if (props.activeFilters.hasOwnProperty(props.filterName)) {
     activeTypeFilters = props.activeFilters[props.filterName];
     if (props.activeFilters[props.filterName].length) {
       dropdownContainerClass += ' resource-filter--active';
+      extraCountText += ' more';
     }
   } else {
     activeTypeFilters = [];
@@ -15,15 +16,19 @@ function FilterDropdown(props) {
 
   const optionListDropdownAlt = props.filterOptions.data.reduce( (accumulator, currentOption, currentIndex) => {
 
-    let thisAction, thisActionLabel, thisButtonClass = 'dropdown-item ', showCount = true;
+    let thisAction, thisActionLabel, thisButtonClass = 'dropdown-item ';
+
+    if (currentOption.count === 0) {
+      thisButtonClass += ' disabled';
+    }
 
     if (!activeTypeFilters.includes(currentOption.value)) {
       thisAction = props.changeHandler;
       thisActionLabel = 'Add the filter';
 
-      if(props.filterName === 'day') {
-        showCount = false;
-      }
+      // if(props.filterName === 'day') {
+      //   showCount = false;
+      // }
 
       accumulator.push(
         <li key={currentIndex}>
@@ -36,7 +41,7 @@ function FilterDropdown(props) {
             onClick={thisAction}
             >
               {currentOption.label} 
-              {showCount ? ` (${currentOption.count})` : ''}
+              {currentOption.count ? ` (${currentOption.count}${extraCountText})` : ` (${currentOption.count})`}
           </button>
         </li>
       );
