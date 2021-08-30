@@ -34,7 +34,16 @@ function LocationCard(props) {
             </ul>
           </li>          
           <li className="list-group-item">{props.location.hoursOpen}<br />{props.location.daysOpen}</li>
-          <li className="list-group-item"><a className="map-link text-dark" href={`https://www.google.com/maps/search/${q}`} title={`View location of ${props.location.name} on a Google Map in a new browser tab`} target="_blank" rel="noopener noreferrer"><i className="fas fa-external-link-alt me-1" aria-hidden="true"></i>Location</a>: {props.location.address}</li>
+          <li className="list-group-item">
+            <a 
+              className="map-link text-dark" 
+              href={`https://www.google.com/maps/dir/?api=1&destination=${q}`} 
+              title={`Get directions from your location to ${props.location.name} on a Google Map in a new browser tab`} 
+              target="_blank" 
+              rel="noopener noreferrer"
+            >
+              <i className="fas fa-external-link-alt me-1" aria-hidden="true"></i>Directions</a>: {props.location.address}
+          </li>
         </ul>
       </div>
     </div>

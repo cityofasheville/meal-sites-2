@@ -486,6 +486,7 @@ class MealSites extends Component {
       let thisLocationPasses = true;
       let filterKeysFailed = [];
       let termMatches = 0;
+      let filterKeysPassed = [];
 
       Object.keys(this.state.activeFilters).forEach( (activeFilterKey, i) => {
         if (this.state.activeFilters[activeFilterKey].length) {
@@ -497,6 +498,8 @@ class MealSites extends Component {
           if (!termMatches) {
             thisLocationPasses = false;
             filterKeysFailed.push(activeFilterKey);
+          } else {
+            filterKeysPassed.push(activeFilterKey);
           }
           termMatches = 0;
         }
@@ -505,6 +508,7 @@ class MealSites extends Component {
       // Following loop is to increment location count based on remaining locations
       Object.keys(filteredDataForOutput.filterOptions).forEach( (allFilterOptionsKey, i) => {
         if (filteredDataForOutput.filterOptions[allFilterOptionsKey].data.length) {
+          let locationAlreadyPassedFacet = false;
           filteredDataForOutput.filterOptions[allFilterOptionsKey].data.forEach( (termObject, i) => {
             let thisOptionLocationCounted = false;
             let otherFacetFailures = 0;
@@ -513,7 +517,10 @@ class MealSites extends Component {
                 otherFacetFailures++;
               }
             });
-            if (location.selectors.includes(termObject.value) && !otherFacetFailures && !thisOptionLocationCounted) {
+            if (filterKeysPassed.includes(allFilterOptionsKey)) {
+              locationAlreadyPassedFacet = true;
+            }
+            if (location.selectors.includes(termObject.value) && !otherFacetFailures && !thisOptionLocationCounted && !locationAlreadyPassedFacet) {
               filteredDataForOutput.filterOptions[allFilterOptionsKey].data[i].count++;
               thisOptionLocationCounted = true;
             }

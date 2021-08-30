@@ -2,16 +2,10 @@ import React from 'react';
 
 function LocationCard(props) {
 
-
-
-  let q = encodeURIComponent(props.location.address);
   let iconClass = props.location.serviceIcon;
-  // let cardMapClass = '';
-  // let q = encodeURIComponent(`${props.location.wgs_y},${props.location.wgs_x}`);
 
   if (props.context === 'map') {
     iconClass += ' service-icon-map';
-    // cardMapClass += ' card-map';
   }
 
   return(
@@ -29,7 +23,10 @@ function LocationCard(props) {
         </ul>
         {props.location.hoursOpen} | {props.location.daysOpen}
       </td>
-      <td className="px-3">Area: {props.location.generalArea}<br /><a className="map-link text-dark" href={`https://www.google.com/maps/search/${q}`} title={`View location of ${props.location.name} on a Google Map in a new browser tab`} target="_blank" rel="noopener noreferrer">Location</a>: {props.location.address}</td>
+      <td className="px-3">
+        Area: {props.location.generalArea}<br />
+        {props.location.address}
+      </td>
     </tr>
   )
 }

@@ -1,8 +1,10 @@
+import React from 'react';
 import { NavLink } from 'react-router-dom';
 
 function NavBar(props) {
 
   let currentUrlParams = new URLSearchParams(window.location.search);
+  let symptomsOfInternetExplorer = /MSIE|Trident/.test(window.navigator.userAgent);
 
   return(
     <nav className="navbar navbar-expand navbar-dark bg-coa-blue">
@@ -13,19 +15,19 @@ function NavBar(props) {
         </div>
         <div className="collapse navbar-collapse flex-row-reverse flex-lg-row" id="navbarNavAltMarkup">
           <div className="navbar-nav">
-            {window.location.pathname !== '/' &&
+            {(window.location.pathname !== '/' && !symptomsOfInternetExplorer) &&
               <button type="button" className="btn btn-link nav-link ms-4 active button-filter__trigger" data-bs-toggle="modal" data-bs-target="#filtersModal">
                 <i className="fa fa-filter nav-link-icon" aria-hidden="true"></i>Filter Results
-              </button>            
+              </button>    
             }
-            {window.location.pathname.startsWith('/print/') &&
+            {(window.location.pathname.startsWith('/print/') && !symptomsOfInternetExplorer) &&
               <NavLink 
                 className="nav-link mx-4 active" 
                 to={`/map/?${currentUrlParams}`}>
                   <i className="fa fa-map-o nav-link-icon" aria-hidden="true"></i>Map View
               </NavLink>
             }
-            {window.location.pathname.startsWith('/map/') && 
+            {(window.location.pathname.startsWith('/map/') && !symptomsOfInternetExplorer) && 
               <NavLink 
                 className="nav-link mx-4 d-none d-lg-inline-block active" 
                 to={`/print/?${currentUrlParams}`}>
