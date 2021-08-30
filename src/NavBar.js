@@ -6,14 +6,6 @@ function NavBar(props) {
   let currentUrlParams = new URLSearchParams(window.location.search);
   let symptomsOfInternetExplorer = /MSIE|Trident/.test(window.navigator.userAgent);
 
-  console.log('IE Check:');
-  console.log(symptomsOfInternetExplorer);
-  console.log(window.navigator.userAgent);
-
-  // if (window.document.documentMode) {
-  //   symptomsOfInternetExplorer = true;
-  // }
-
   return(
     <nav className="navbar navbar-expand navbar-dark bg-coa-blue">
       <div className="container-fluid">
@@ -23,11 +15,6 @@ function NavBar(props) {
         </div>
         <div className="collapse navbar-collapse flex-row-reverse flex-lg-row" id="navbarNavAltMarkup">
           <div className="navbar-nav">
-            {/* {window.location.pathname !== '/' &&
-              <button type="button" className="btn btn-link nav-link ms-4 active button-filter__trigger" data-bs-toggle="modal" data-bs-target="#filtersModal">
-                <i className="fa fa-filter nav-link-icon" aria-hidden="true"></i>Filter Results
-              </button>            
-            } */}
             {(window.location.pathname !== '/' && !symptomsOfInternetExplorer) &&
               <button type="button" className="btn btn-link nav-link ms-4 active button-filter__trigger" data-bs-toggle="modal" data-bs-target="#filtersModal">
                 <i className="fa fa-filter nav-link-icon" aria-hidden="true"></i>Filter Results

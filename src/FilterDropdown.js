@@ -2,7 +2,9 @@ import React from 'react';
 
 function FilterDropdown(props) {
 
-  let activeTypeFilters, dropdownContainerClass = 'dropdown mx-2 mb-4 resource-filter', extraCountText = '';
+  let activeTypeFilters
+  let dropdownContainerClass = 'dropdown mx-2 mb-4 resource-filter'
+  let extraCountText = '';
   
   if (props.activeFilters.hasOwnProperty(props.filterName)) {
     activeTypeFilters = props.activeFilters[props.filterName];
@@ -41,7 +43,7 @@ function FilterDropdown(props) {
             onClick={thisAction}
             >
               {currentOption.label} 
-              {currentOption.count ? ` (${currentOption.count}${extraCountText})` : ` (${currentOption.count})`}
+              {` (${currentOption.count}${extraCountText})`}
           </button>
         </li>
       );
