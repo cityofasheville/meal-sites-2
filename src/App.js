@@ -6,9 +6,7 @@ import MealSites from './MealSites';
 function App() {
   return (
     <Router>
-      {/* <Route path="/" component={NavBar} /> */}
-      {/* <Route exact path="/" component={Banner} /> */}
-      {/* <Route path="/" component={MealSites} /> */}
+      {/* :view will be either "map" or "print", asterisk manages all filter params */}
       <Route path="/:view*" component={MealSites} />
     </Router>
   );

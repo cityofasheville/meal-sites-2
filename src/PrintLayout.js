@@ -3,9 +3,11 @@ import LocationStrip from './LocationStrip';
 
 function PrintLayout(props) {
 
+  let filteredLocationsSetSize = props.filteredLocations.length;
+
   let locationStrips = props.filteredLocations.map( (location, i) => {
     return (
-      <LocationStrip key={i} location={location} />
+      <LocationStrip key={i} location={location} posInSet={i+1} setSize={filteredLocationsSetSize}  />
     )
   })
   

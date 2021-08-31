@@ -17,9 +17,12 @@ class MapLayout extends React.Component {
   }
 
   componentDidUpdate() {
-    // Need the leaflet container to re-size itself when "show/hide list" toggle happens
+    // Need the leaflet container to re-size itself when "show/hide list" toggle happens (prevents empty gray tiles)
     if (this.mapRef !== null) {
       this.mapRef.invalidateSize();
+      // TODO - reset the center and zoom after show/hide list button is pressed
+      // Something like:
+      // this.mapRef.setView([CENTER_VALUE], [ZOOM_VALUE]);
       console.log('Invalidating Map Size');
     }
   }
@@ -39,18 +42,19 @@ class MapLayout extends React.Component {
     }
 
     let locationMarkers = this.props.filteredLocations.map( (location, i) => {
+      
       let thisPosition = [location.wgs_y, location.wgs_x];
       let thisKey = `marker-${location.OBJECTID}`;
 
       // Custom marker trickery to use FA icons:
       // https://stackoverflow.com/a/52131216
 
-      const iconMarkup = renderToStaticMarkup(<i className={location.serviceIcon} />);
+      const iconMarkup = renderToStaticMarkup(<i className={location.serviceIcon} title={`${location.name} offering ${location.type}`} />);
       const customMarkerIcon = divIcon({
         html: iconMarkup,
       });
 
-      // Adding eventHandlers to markers below to address Safari issue:
+      // Add eventHandlers to markers below to address Safari issue:
       // https://github.com/Leaflet/Leaflet/issues/7331#issuecomment-862519242
       return(
         <Marker 
@@ -58,6 +62,7 @@ class MapLayout extends React.Component {
           // center={thisPosition}
           position={thisPosition} 
           icon={customMarkerIcon}
+          keyboard={true}
           eventHandlers={{ click: function(e) {this.openPopup();} }}
         >
           <Popup minWidth='275' maxWidth='300'>
@@ -100,7 +105,10 @@ class MapLayout extends React.Component {
           attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        <MarkerClusterGroup key={millisecondsNow}>
+        <MarkerClusterGroup 
+          key={millisecondsNow}
+          keyboard={true}
+        >
           {locationMarkers}
         </MarkerClusterGroup>
         <ToggleViewButton

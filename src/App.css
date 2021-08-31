@@ -13,6 +13,7 @@
   --coa-platinum: #E6E8E6;
 
   --coa-day-of-week-open: rgba(135, 199, 70, .5);
+  --coa-day-of-week-closed: rgba(208, 209, 209, .3);
 }
 
 html {
@@ -133,31 +134,46 @@ html, body, #root {
   display: inline-block;
 }
 
-h1 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 400;
+}
 
-  font-size: 1.6em;
+h1 {
+  font-size: 1.5rem;
 }
 
 @media (min-width: 576px) {
 
-h1 {
-    font-size: 1.8em
-}
+  h1 {
+      font-size: 2rem;
   }
+}
 
 @media (min-width: 768px) {
 
-h1 {
-    font-size: 2.2em
-}
+  h1 {
+      font-size: 2.25rem;
   }
+}
 
 @media (min-width: 992px) {
 
-h1 {
-    font-size: 2.5em
-}
+  h1 {
+    font-size: 2.5rem;
   }
+}
+
+@media (min-width: 1200px) {
+
+  h1 {
+      font-size: 2.75rem;
+  }
+}
 
 h2 {
 
@@ -324,6 +340,7 @@ h3 {
   position: relative;
   display: inline-block;
   width: 10%;
+  color: var(--coa-black);
   text-align: center;
   margin: 0 6px 0 0;
   padding: 3px;
@@ -339,8 +356,8 @@ h3 {
 }
 
 .day-of-week--off {
-  background-color: gray;
-  opacity: .3;
+  background-color: var(--coa-day-of-week-closed);
+  opacity: .6;
 }
 
 .table-print {
@@ -354,9 +371,12 @@ h3 {
   width: 33.33%;
 }
 
+/* 
+This is now handled dynamically in MealSites component, in ComponentDidUpdate()
 #main {
-  height: calc(100% - 75px);
-}
+  height: calc(100% - 100px);
+} 
+*/
 
 .leaflet-container {
   height: 100%;
@@ -509,6 +529,10 @@ td, th {
   min-width: 270px;
 }
 
+.icon-print {
+  font-size: 1rem;
+}
+
 @media print {
 
   body {
@@ -537,5 +561,12 @@ td, th {
   .print-days-column {
     min-width: 7cm;
   }
+}
 
+.results-meta-container {
+  border-bottom: 1px solid var(--coa-black);
+}
+
+.site-masthead {
+  max-height: 100px;
 }

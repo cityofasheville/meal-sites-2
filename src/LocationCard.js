@@ -5,7 +5,6 @@ function LocationCard(props) {
   let q = encodeURIComponent(props.location.address);
   let iconClass = props.location.serviceIcon;
   let cardMapClass = ' mb-5';
-  // let q = encodeURIComponent(`${props.location.wgs_y},${props.location.wgs_x}`);
 
   if (props.context === 'map') {
     iconClass += ' service-icon-map';
@@ -13,9 +12,9 @@ function LocationCard(props) {
   }
 
   return(
-    <div className={`col p-0 all-objects object-${props.location.OBJECTID} ${props.location.selectors} ${cardMapClass}`}>
+    <article aria-posinset={props.posInSet} aria-setsize={props.setSize} className={` all-objects object-${props.location.OBJECTID} ${props.location.selectors} ${cardMapClass}`}>
       <div className="card inner m-3 h-100">
-        <div className="card-header"><h3>{props.location.name}</h3></div>
+        <header className="card-header"><h3 className="my-2">{props.location.name}</h3></header>
         <ul className="list-group list-group-flush">
           {
             (props.context !== 'map') && 
@@ -46,7 +45,7 @@ function LocationCard(props) {
           </li>
         </ul>
       </div>
-    </div>
+    </article>
   )
 }
 

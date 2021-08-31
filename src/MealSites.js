@@ -18,7 +18,8 @@ class MealSites extends Component {
       filterOptions: {},
       filterSelectors: [],
       showList: true,
-      haveLocationData: false
+      haveLocationData: false,
+      navHeight: 100
     };
   }
 
@@ -404,6 +405,7 @@ class MealSites extends Component {
   submitQueryString = (e) => {
 
     e.preventDefault();
+
     let currentUrlParams = new URLSearchParams(window.location.search);
     const newFilterValue = e.target.getAttribute("data-filter-value");
     const newFilterType = e.target.getAttribute("data-filter-type");
@@ -413,12 +415,10 @@ class MealSites extends Component {
     if (!currentUrlParams.has(newFilterType)) {
       currentUrlParams.set(newFilterType, newFilterValue);
       this.props.history.push(`?${currentUrlParams}`);
-      // console.log('Pushing history, component should update');
     } else {
       if (currentUrlParams.getAll(newFilterType).indexOf(newFilterValue) < 0) {
         currentUrlParams.append(newFilterType, newFilterValue);
         this.props.history.push(`?${currentUrlParams}`);
-        // console.log('Pushing history, component should update');
       }
     }
 
@@ -439,7 +439,6 @@ class MealSites extends Component {
     const removeFilterType = e.target.getAttribute("data-filter-type");
 
     let currentTypeParams = currentUrlParams.getAll(removeFilterType);
-    // console.log(currentTypeParams);
 
     let remainingTypeParams = currentTypeParams.filter( (item) => {
       return (item !== removeFilterValue);
@@ -456,7 +455,6 @@ class MealSites extends Component {
     }
 
     this.props.history.push(`?${currentUrlParams}`);
-    // console.log('Pushing history, component should update');
 
     let newActiveFilters = {};
     Object.keys(this.state.filterOptions).forEach( (filter) => {
@@ -468,11 +466,6 @@ class MealSites extends Component {
   }
 
   applyFilters = () => {
-
-    // TODO - Correct counts for filters that are part of multi-value facet (like day of week)
-    // Current counts work only for single value facets (like area or service type)
-    // Think of grocery stores - they often proide EBT and WIC (two service types)
-    // While checking a filter, see if any other filters of the same type have already been applied, and subtract the count of those
     
     let filterOptionReset = JSON.parse(JSON.stringify(this.state.filterOptions));
 
@@ -489,38 +482,52 @@ class MealSites extends Component {
       let filterKeysPassed = [];
 
       Object.keys(this.state.activeFilters).forEach( (activeFilterKey, i) => {
+        
         if (this.state.activeFilters[activeFilterKey].length) {
+          
           this.state.activeFilters[activeFilterKey].forEach( (term) => {
             if (location.selectors.includes(term)) {
               termMatches++;
             } 
           });
+
           if (!termMatches) {
             thisLocationPasses = false;
             filterKeysFailed.push(activeFilterKey);
           } else {
             filterKeysPassed.push(activeFilterKey);
           }
+
           termMatches = 0;
         }
       });
 
-      // Following loop is to increment location count based on remaining locations
+      // The following loop is to increment filter counts based on remaining locations
       Object.keys(filteredDataForOutput.filterOptions).forEach( (allFilterOptionsKey, i) => {
+        
         if (filteredDataForOutput.filterOptions[allFilterOptionsKey].data.length) {
+          
           let locationAlreadyPassedFacet = false;
+          
           filteredDataForOutput.filterOptions[allFilterOptionsKey].data.forEach( (termObject, i) => {
+            
             let thisOptionLocationCounted = false;
             let otherFacetFailures = 0;
+            
             filterKeysFailed.forEach( (failedKey, i) => {
+              // If location failed another facet, it's already been filtered out
               if (failedKey !== allFilterOptionsKey) {
                 otherFacetFailures++;
               }
             });
+            
             if (filterKeysPassed.includes(allFilterOptionsKey)) {
+              // If location already passed this facet, selecting another of the facet's filters will not increase size of result set
               locationAlreadyPassedFacet = true;
             }
+            
             if (location.selectors.includes(termObject.value) && !otherFacetFailures && !thisOptionLocationCounted && !locationAlreadyPassedFacet) {
+              // Now we can increment the count for this filter, and 
               filteredDataForOutput.filterOptions[allFilterOptionsKey].data[i].count++;
               thisOptionLocationCounted = true;
             }
@@ -529,13 +536,14 @@ class MealSites extends Component {
       });
 
       return thisLocationPasses; 
-    });
+
+    }); 
 
     return filteredDataForOutput;
   }
 
   toggleView = (e) => {
-    let toggleIcon = 'fas fa-angle-double-right me-1';
+    let toggleIcon = 'far fa-list-alt me-1';
     let toggleText = 'Show List';
 
     if (!this.state.showList) {
@@ -544,10 +552,23 @@ class MealSites extends Component {
     }
     document.getElementById("mapToggleButton").innerHTML = `<i class="${toggleIcon}" aria-hidden="true"></i> ${toggleText}`;
     let toggledValue = !this.state.showList;
-    // console.log(toggledValue);
     this.setState({
       showList: toggledValue
     });
+  }
+
+  componentDidUpdate() {
+    // To accommodate main layout - a fixed map alongside a scrollable list (via overflow), we're setting a height on the <main> element
+    // The height of <main> depends on how much is left over after the navbar takes up its space
+    // This little block is meant to measure the navbar when the page updates and update navHeight in state (then applied to <main> in render() method)
+    // This method does NOT capture height changes due to window resizing (however, any post-window-resize interaction will re-measure the nav)
+    let navBarElement = document.querySelector('.navbar');
+    let height = navBarElement.offsetHeight;
+    if (height !== this.state.navHeight) {
+      this.setState({
+        navHeight: height
+      });
+    }
   }
 
   render() {
@@ -576,12 +597,12 @@ class MealSites extends Component {
     console.log('FILTERS APPLIED');
     console.log(filtersApplied);
 
-    const locationGrid = filtersApplied.locations.map( (thisLocation,i) => {
+    let filteredLocationsSetSize = filtersApplied.locations.length;
+
+    const locationGrid = filtersApplied.locations.map( (thisLocation, i) => {
       let thisKey = `location-${i}`;
       return (
-        <div key={thisKey} className="location-item">
-            <LocationCard location={thisLocation} />
-        </div>
+        <LocationCard key={thisKey} location={thisLocation} posInSet={i+1} setSize={filteredLocationsSetSize} />
       );
     });
 
@@ -595,11 +616,11 @@ class MealSites extends Component {
 
     return(
       <>
-        <header>
+        <header className="site-masthead">
           <NavBar />
         </header>
 
-        <main id="main" title="Asheville Area Food Resources">
+        <main id="main" title="Asheville Area Food Resources" style={{height: `calc(100% - ${this.state.navHeight}px)`}}>
           
           {(!this.props.match.params.view) &&
             <section id="introBanner" title="About This Site" className="h-100 container-fluid p-0 m-0">
@@ -608,7 +629,7 @@ class MealSites extends Component {
           }
 
           {(this.props.match.params.view === 'print') &&
-            <section id="foodLocationsPrint" title="Print friendly list of resources" className="h-100 container">
+            <section id="foodLocationsPrint" title="Print friendly list of food resources" className="h-100 container">
               <PrintLayout filteredLocations={filtersApplied.locations} />       
             </section>        
           }
@@ -616,22 +637,22 @@ class MealSites extends Component {
           {(this.props.match.params.view === 'map') &&
             <div className="h-100 container-fluid px-0">
               <div className="h-100 row m-0">
-                <div className={listContainerClasslist}>
-                  <section title="List of resources" className="h-100 p-0 m-0">
+                <section title="List of food resources matching selected filters" className={listContainerClasslist}>
+                  <div className="h-100 p-0 m-0">
                     <div className="m-0 p-0">
                       <button className="mx-0 d-inline-block d-lg-none btn btn-light border-dark button-view-toggle" onClick={this.toggleView}>
                         <i className="fa fa-map-o nav-link-icon" aria-hidden="true"></i>Show Map
                       </button>
                     </div>
                     <div className="row row-cols-xs-1 mx-0 mt-4 px-4">
-                      <ResultsMeta resultsCount={filtersApplied.locations.length} options={filtersApplied.filterOptions} activeFilters={this.state.activeFilters} removeHandler={this.removeQueryParam} />                    
+                      <ResultsMeta resultsCount={filteredLocationsSetSize} options={filtersApplied.filterOptions} activeFilters={this.state.activeFilters} removeHandler={this.removeQueryParam} />                    
                     </div>
                     <div id="foodLocationsList" className="row row-cols-xs-1 row-cols-md-2 row-cols-lg-1 row-cols-xl-2 p-0 m-0">
                       {locationGrid}
                     </div>  
-                  </section>
-                </div>
-                <section title="Map of resources" className={mapContainerClasslist}>
+                  </div>
+                </section>
+                <section title="Map of food resources matching selected filters" className={mapContainerClasslist}>
                   <div className="h-100 p-0 m-0 map-split">
                     <MapLayout showList={this.state.showList} toggleHandler={this.toggleView} filteredLocations={filtersApplied.locations} filteredAreas={this.state.activeFilters.hasOwnProperty('area') ? this.state.activeFilters.area : []} />            
                   </div>
@@ -640,7 +661,7 @@ class MealSites extends Component {
             </div>
           }
 
-          <aside title="Dialog to adjust filter options" className="modal fade" id="filtersModal" tabIndex="-1" aria-labelledby="filtersModalLabel" aria-hidden="true" data-bs-keyboard="true" data-bs-focus="true">
+          <aside title="Dialog box containing filter options" className="modal fade" id="filtersModal" tabIndex="-1" aria-labelledby="filtersModalLabel" aria-hidden="true" data-bs-keyboard="true" data-bs-focus="true">
             <div className="modal-dialog modal-lg mt-4">
               <div className="modal-content">
                 <div className="modal-header">

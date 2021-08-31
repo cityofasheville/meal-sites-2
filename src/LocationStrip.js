@@ -4,12 +4,12 @@ function LocationCard(props) {
 
   let iconClass = props.location.serviceIcon;
 
-  if (props.context === 'map') {
-    iconClass += ' service-icon-map';
-  }
+  // if (props.context === 'map') {
+  //   iconClass += ' service-icon-map';
+  // }
 
   return(
-    <tr className={`all-objects object-${props.location.OBJECTID} ${props.location.selectors}`}>
+    <tr aria-posinset={props.posInSet} aria-setsize={props.setSize} className={`all-objects object-${props.location.OBJECTID} ${props.location.selectors}`}>
       <td className="px-3"><h3>{props.location.name}</h3><i className={`${iconClass} icon-print`} aria-hidden="true"></i> {props.location.type === 'Students' ? 'Student Meals' : props.location.type}</td>
       <td className="px-3">
         <ul className="week-list week-list--print" aria-label="Days of the week">
