@@ -2,8 +2,9 @@ import React from 'react';
 import FilterDropdown from './FilterDropdown';
 
 function FilterOptions(props) {
-  // console.log(props);
+
   const filterKeys = Object.keys(props.options);
+
   const filterDropdownSet = filterKeys.map( (key, i) => {
     let thisKey = `filterdropdown-${i}`;
     return (
@@ -12,9 +13,9 @@ function FilterOptions(props) {
   });
 
   return(
-    <section title="Filter meal sites based on geographical area, days open, or type of service provided." className="my-4 js-dependent no-print" id="navbarToggleExternalContent">
+    <section title="Filter food resources based on geographical area, days open, or type of service provided." className="my-4 js-dependent no-print">
 
-      <div className="btn-group d-block d-lg-flex full-width" role="group" aria-label="Filter meal sites based on geographical area, days open, or type of service provided.">       
+      <div className="btn-group d-block d-lg-flex full-width" role="group">       
         {filterDropdownSet}
       </div> 
      

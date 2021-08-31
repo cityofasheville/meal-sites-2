@@ -20,7 +20,7 @@ function ResultsMeta(props) {
             key={thisKey}
             data-filter-value={thisFilter} 
             data-filter-type={activeFilterKey} 
-            className='btn btn-outline-dark btn-sm me-3 button-filter__remove' 
+            className='btn btn-outline-dark btn-sm me-3 mb-3 button-filter__remove' 
             type="button" 
             title={`Remove the filter ${filterLabel.label}`} 
             onClick={props.removeHandler}
@@ -37,14 +37,14 @@ function ResultsMeta(props) {
 
 
   return(
-    <div className="ps-0">
-      <h2 className="mb-0 me-3"><i className="fas fa-map-marker-alt me-2" aria-hidden="true"></i>{props.resultsCount} resources found
+    <header className="ps-0 mb-4 results-meta-container">
+      <h2 className="mb-0 me-3">
+        {props.resultsCount} Food resources found
       </h2>
-      <div className="my-3">
+      <div className="my-4">
         {removeFilterButtons}
       </div>
-      <hr className="mt-4" />
-    </div>
+    </header>
   );
 }
 
