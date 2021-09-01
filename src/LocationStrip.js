@@ -10,7 +10,7 @@ function LocationCard(props) {
 
   return(
     <tr aria-posinset={props.posInSet} aria-setsize={props.setSize} className={`all-objects object-${props.location.OBJECTID} ${props.location.selectors}`}>
-      <td className="px-3"><h3>{props.location.name}</h3><i className={`${iconClass} icon-print`} aria-hidden="true"></i> {props.location.type === 'Students' ? 'Student Meals' : props.location.type}</td>
+      <td className="px-3"><p className="mb-2">{props.location.name}</p><i className={`${iconClass} icon-print px-0`} aria-hidden="true"></i> {props.location.type === 'Students' ? 'Student Meals' : props.location.type}</td>
       <td className="px-3">
         <ul className="week-list week-list--print" aria-label="Days of the week">
           <li className={`day-of-week ${props.location.styleM}`} title={`${props.location.name} ${props.location.type} service is ${props.location.styleM === 'day-of-week--on' ? 'open' : 'closed'} on Monday`}><span className="day-label">M</span></li>
