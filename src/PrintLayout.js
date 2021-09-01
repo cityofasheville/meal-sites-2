@@ -17,9 +17,9 @@ function PrintLayout(props) {
         <caption>List of Asheville Food Resources - Printable Layout</caption>
         <thead>
           <tr>
-            <th className="px-3 print-name-column" scope="col">Location and Service</th>
-            <th className="px-3 print-days-column" scope="col">Schedule</th>
-            <th className="px-3 print-location-column" scope="col">Location</th>
+            <th className="px-3 print-name-column fs-3" scope="col">Location and Service</th>
+            <th className="px-3 print-days-column fs-3" scope="col">Schedule</th>
+            <th className="px-3 print-location-column fs-3" scope="col">Location</th>
           </tr>
 
           {(props.filteredLocations.length === 0) &&
