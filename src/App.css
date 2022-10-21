@@ -34,6 +34,18 @@ html, body, #root {
   width: 100%;
 }
 
+a {
+  color: var(--coa-black);
+  text-decoration: underline;
+}
+
+a:hover,
+a:focus,
+a:active {
+  color: var(--coa-black);
+  text-decoration: none;
+}
+
 .home-cover {
   background: url('./images/mountains-cover.jpg') no-repeat center center fixed;
   background-size: cover;  

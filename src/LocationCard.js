@@ -5,16 +5,37 @@ function LocationCard(props) {
   let q = encodeURIComponent(props.location.address);
   let iconClass = props.location.serviceIcon;
   let cardMapClass = ' mb-5';
+  let headingTextElement;
 
   if (props.context === 'map') {
     iconClass += ' service-icon-map';
     cardMapClass = ' location-card-popup';
+  } 
+
+  if (props.location.url) {
+    // console.log(props.location.url.substring(0,4));
+    let urlPrefix = '';
+    if (props.location.url.substring(0,4) !== 'http') {
+      urlPrefix += 'https://';
+    }
+    headingTextElement = <>
+      <a href={urlPrefix + props.location.url} target="_blank" rel="noopener noreferrer" aria-label={`Vists ${props.location.name} website in a new tab`}>
+        <i className="fas fa-external-link-alt me-2" aria-hidden="true"></i>
+        {props.location.name}
+      </a>
+    </>;
+  } else {
+    headingTextElement = props.location.name;
   }
 
   return(
     <article aria-posinset={props.posInSet} aria-setsize={props.setSize} className={` all-objects object-${props.location.OBJECTID} ${props.location.selectors} ${cardMapClass}`}>
       <div className="card inner m-3 h-100">
-        <header className="card-header"><h3 className="my-2">{props.location.name}</h3></header>
+        <header className="card-header">
+          <h3 className="my-2">
+            {headingTextElement}
+          </h3>
+        </header>
         <ul className="list-group list-group-flush">
           {
             (props.context !== 'map') && 
@@ -43,6 +64,11 @@ function LocationCard(props) {
             >
               <i className="fas fa-external-link-alt me-1" aria-hidden="true"></i>Directions</a>: {props.location.address}
           </li>
+          {props.location.notes && (
+            <li className="list-group-item">
+              Notes: {props.location.notes}
+            </li>
+          )}
         </ul>
       </div>
     </article>
