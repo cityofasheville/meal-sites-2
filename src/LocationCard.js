@@ -13,7 +13,6 @@ function LocationCard(props) {
   } 
 
   if (props.location.url) {
-    // console.log(props.location.url.substring(0,4));
     let urlPrefix = '';
     if (props.location.url.substring(0,4) !== 'http') {
       urlPrefix += 'https://';
