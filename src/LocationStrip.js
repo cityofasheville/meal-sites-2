@@ -3,14 +3,39 @@ import React from 'react';
 function LocationCard(props) {
 
   let iconClass = props.location.serviceIcon;
+  // let headingTextElement;
 
   // if (props.context === 'map') {
   //   iconClass += ' service-icon-map';
   // }
 
+  // if (props.location.url) {
+  //   let urlPrefix = '';
+  //   if (props.location.url.substring(0,4) !== 'http') {
+  //     urlPrefix += 'https://';
+  //   }
+  //   headingTextElement = <>
+  //     <a href={urlPrefix + props.location.url} target="_blank" rel="noopener noreferrer" aria-label={`Vists ${props.location.name} website in a new tab`}>
+  //       <i className="fas fa-external-link-alt me-2" aria-hidden="true"></i>
+  //       {props.location.name}
+  //     </a>
+  //   </>;
+  // } else {
+  //   headingTextElement = props.location.name;
+  // }
+
   return(
     <tr aria-posinset={props.posInSet} aria-setsize={props.setSize} className={`all-objects object-${props.location.OBJECTID} ${props.location.selectors}`}>
-      <td className="px-3"><p className="mb-2">{props.location.name}</p><i className={`${iconClass} icon-print px-0`} aria-hidden="true"></i> {props.location.type === 'Students' ? 'Student Meals' : props.location.type}</td>
+      <td className="px-3">
+        <p className="my-1">{props.location.name}</p>
+        <p className="my-1">
+          <i className={`${iconClass} icon-print px-0`} aria-hidden="true"></i> 
+          {props.location.type === 'Students' ? 'Student Meals' : props.location.type}
+        </p>
+        {props.location.notes && (
+          <p className="my-1">Notes: {props.location.notes}</p>
+        )}
+      </td>
       <td className="px-3">
         <ul className="week-list week-list--print" aria-label="Days of the week">
           <li className={`day-of-week ${props.location.styleM}`} title={`${props.location.name} ${props.location.type} service is ${props.location.styleM === 'day-of-week--on' ? 'open' : 'closed'} on Monday`}><span className="day-label">M</span></li>
